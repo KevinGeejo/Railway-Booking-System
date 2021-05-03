@@ -1,1 +1,4 @@
 train-*
+*.code-workspace
+.idea*
+.vscode*
