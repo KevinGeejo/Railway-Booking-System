@@ -2,3 +2,4 @@ train-*
 *.code-workspace
 .idea*
 .vscode*
+ref*
