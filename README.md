@@ -2,8 +2,8 @@
 
 ## Project Schedule
 
-- [ ] **(Due 5.5)** Finish designing part of the database: ER graph, BCNF-normalization, schema
-- [ ] **(Due 5.5)** Finish design doc 1
+- [x] **(Due 5.5)** Finish designing part of the database: ER graph, BCNF-normalization, schema
+- [x] **(Due 5.5)** Finish design doc 1
 - [ ] **(Due 5.8)** Finish SQL query templates (add them to design doc 2)
 - [ ] **(Due 5.14)** Finish the method of building back-end database
 - [ ] **(Due 5.14)** Have a basic front-end framework in the project
