@@ -1,50 +1,57 @@
 -- create tables
 
-create table station(
-	s_stationname varchar(20),
-	s_city        varchar(20)
+create table stations(
+	s_stationname varchar(20) primary key,
+	s_city        varchar(20) not null
 	);
 
-create table user(
-	u_idnumber    char(18),
-	u_name        varchar(15),
-	u_phone       char(11),
-	u_creditcard  char(16),
-	u_username    varchar(15)
+create table users(
+	u_idnumber    char(18) primary key,
+	u_name        varchar(20) not null,
+	u_phone       char(11) not null,
+	u_creditcard  char(16) not null,
+	u_username    varchar(20) not null,
+    unique(u_phone)
 	);
 
-create table trainstartstation(
-	-- tid 应该用varchar吗
-	tss_tid          varchar(6),
-	tss_startstation varchar(20),
-	tss_starttime    time
+-- tss_tid不需要外键
+create table trainstartstations(
+	tss_tid          varchar(5) primary key,
+	tss_startstation varchar(20) not null,
+	tss_starttime    time not null,
+	foreign key(tss_startstation) references stations(s_stationname)
 	);
 
-create table trainitem(
-	ti_tid            varchar(6),
+create table trainitems(
+	ti_tid            varchar(5),
 	ti_arrivalstation varchar(20),
-	ti_arrivaltime    time,
-	-- arrival和departure时间恰好分属两天的情况则如何?
-	ti_departuretime  time,
-	ti_sslprice       decimal,
-	ti_ssuprice       decimal,
-	ti_hslprice       decimal,
-	ti_hsmprice       decimal,
-	ti_hsuprice       decimal,
-	ti_sseprice       decimal,
-	ti_hseprice       decimal
+	ti_arrivaltime    time default time '00:00:00',
+    -- 后续考虑arrival和departure时间恰好分属两天的情况
+	ti_departuretime  time default time '00:00:00',
+	ti_sslprice       float  default 0,
+	ti_ssuprice       float  default 0,
+	ti_hslprice       float  default 0,
+	ti_hsmprice       float  default 0,
+	ti_hsuprice       float  default 0,
+	ti_sseprice       float  default 0,
+	ti_hseprice       float  default 0,
+	primary key(ti_tid, ti_arrivalstation),
+	foreign key(ti_arrivalstation) references stations(s_stationname)
 	);
+
+create type seat_t as enum ('ssl','ssu','hsl','hsm','hsu','sse', 'hse');
+create type stat_t as enum ('cancelled', 'expired', 'valid');
 
 create table orders(
-	o_oid              char(15),
-	o_idnumber         char(18),
-	-- tid 应该用varchar吗
-	o_tid              varchar(6),
-	o_departuredate    date,
-	o_departuretime    time,
-	-- seattype类型需要检查
-	o_seattype         ENUM('ssl','ssu','hsl','hsm','hsu','sse', 'hse'),
-	o_orderstatus      ENUM('cancelled', 'expired', 'valid'),
-	o_departurestation varchar(20),
-	o_arrivalstation   varchar(20)
+	o_oid              char(15) primary key,
+	o_idnumber         char(18) not null,
+	o_tid              varchar(5) not null,
+	o_departuredate    date not null,
+	o_departuretime    time not null,
+	o_seattype         seat_t not null,
+	o_orderstatus      stat_t default 'valid',
+	o_departurestation varchar(20) not null,
+	o_arrivalstation   varchar(20) not null,
+	foreign key(o_idnumber) references users(u_idnumber),
+	foreign key(o_tid, o_arrivalstation) references trainitems(ti_tid, ti_arrivalstation)
 	);

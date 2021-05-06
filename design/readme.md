@@ -41,25 +41,24 @@
 
 ### Order
 
-**候选键**：Oid, Tid, IdentityNumber .
+**候选键**：Oid
 
-**非键属性**：Day, Time, TotalPrice, SeatType, OrderStatus, DepartureStation, ArrivalStation .
+**非键属性**：Tid, IdentityNumber, Day, Time, TotalPrice, SeatType, OrderStatus, DepartureStation, ArrivalStation .
 
 **依赖关系**：
 
 ```
 (1) Oid -> Tid IdentityNumber Day Time TotalPrice SeatType OrderStatus DepartureStation ArrivalStation
-(2) Tid IdentityNumber -> Oid Day Time TotalPrice SeatType OrderStatus DepartureStation ArrivalStation
-(3) Tid DepatureStation ArrivalStation SeatType -> TotalPrice
+(2) Tid DepatureStation ArrivalStation SeatType -> TotalPrice
 ```
 
-**范式判断**：依赖关系 (3) 为非键传递依赖，因此 Order 满足 2NF.
+**范式判断**：依赖关系 (2) 为非键传递依赖，因此 Order 满足 2NF.
 
 **消除依赖**：删除 TotalPrice 项，因为价格可以通过连接 TrainItem 表查找得到。
 
 ### Station
 
-**候选键**：Sid, StationName, City.
+**候选键**：Sid, (StationName, City)
 
 **非键属性**：无。
 
@@ -76,7 +75,7 @@
 
 ### TrainItem
 
-**候选键**：Tid, StartStation, ArrivalStation.
+**候选键**：(Tid, StartStation, ArrivalStation)
 
 **非键属性**：ArrivalTime, DepartureTime, HardSealPrice, SoftSeatPrice, HardSleeperUPrice, HardSleeperMprice, HardSleeperLPrice, SoftSleeperUPrice, SoftSleeperLPrice.
 
@@ -92,7 +91,7 @@
 
 **消除依赖**：
 
-1. 将 TrainIterm 表分解为为以下两个部分:
+1. 将 TrainIterm 表分解为以下两个部分:
    - $\rm \pi_{(Tid,StartStation)}TrainItem$:作为一个新主体，被命名为 TrainStartStation；
    - $\rm \pi_{(Tid, AS, AT, DT, HSP, SSP, HSUP, HSMP, HSLP, SSUP, SSLP)}Train Item$: 删除 StartStation 项，并保持原名 TrainIterm；
 2. 两表以车次的起始站相联系；这个分解为无损分解，分解后两表均满足 BCNF.
@@ -161,6 +160,64 @@
 考虑该数据库应具有的外键约束、完整性约束等，仿照 TPCH 文档，画出的关系模式图如下：
 
 ![schema](readme.assets/schema.png)
+
+以下的 create table 语句可以代替说明具体的关系模式:
+
+```sql
+create table stations(
+	s_stationname varchar(20) primary key,
+	s_city        varchar(20) not null
+	);
+
+create table users(
+	u_idnumber    char(18) primary key,
+	u_name        varchar(20) not null,
+	u_phone       char(11) not null,
+	u_creditcard  char(16) not null,
+	u_username    varchar(20) not null,
+    unique(u_phone)
+	);
+
+create table trainstartstations(
+	tss_tid          varchar(5) primary key,
+	tss_startstation varchar(20) not null,
+	tss_starttime    time not null,
+	foreign key(tss_startstation) references stations(s_stationname)
+	);
+
+create table trainitems(
+	ti_tid            varchar(5),
+	ti_arrivalstation varchar(20),
+	ti_arrivaltime    time default time '00:00:00',
+	ti_departuretime  time default time '00:00:00',
+	ti_sslprice       float  default 0,
+	ti_ssuprice       float  default 0,
+	ti_hslprice       float  default 0,
+	ti_hsmprice       float  default 0,
+	ti_hsuprice       float  default 0,
+	ti_sseprice       float  default 0,
+	ti_hseprice       float  default 0,
+	primary key(ti_tid, ti_arrivalstation),
+	foreign key(ti_arrivalstation) references stations(s_stationname)
+	);
+
+create type seat_t as enum ('ssl','ssu','hsl','hsm','hsu','sse', 'hse');
+create type stat_t as enum ('cancelled', 'expired', 'valid');
+
+create table orders(
+	o_oid              char(15) primary key,
+	o_idnumber         char(18) not null,
+	o_tid              varchar(5) not null,
+	o_departuredate    date not null,
+	o_departuretime    time not null,
+	o_seattype         seat_t not null,
+	o_orderstatus      stat_t default 'valid',
+	o_departurestation varchar(20) not null,
+	o_arrivalstation   varchar(20) not null,
+	foreign key(o_idnumber) references users(u_idnumber),
+    foreign key(o_tid, o_arrivalstation) references trainitems(ti_tid, ti_arrivalstation)
+	);
+```
 
 ## 成员分工
 
