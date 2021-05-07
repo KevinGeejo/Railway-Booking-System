@@ -14,12 +14,14 @@ create table users(
     unique(u_phone)
 	);
 
--- tss_tid不需要外键
-create table trainstartstations(
-	tss_tid          varchar(5) primary key,
-	tss_startstation varchar(20) not null,
-	tss_starttime    time not null,
-	foreign key(tss_startstation) references stations(s_stationname)
+-- tsi_tid不需要外键
+create table trainstaticinfo(
+	tsi_tid          varchar(5) primary key,
+	tsi_startstation varchar(20) not null,
+    tsi_terminal     varchar(20) not null,
+	tsi_starttime    time not null,
+	foreign key(tsi_startstation) references stations(s_stationname),
+	foreign key(tsi_terminal) references stations(s_stationname)
 	);
 
 create table trainitems(
