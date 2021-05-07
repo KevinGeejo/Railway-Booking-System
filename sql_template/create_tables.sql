@@ -26,7 +26,8 @@ create table trainstaticinfo(
 
 create table trainitems(
 	ti_tid            varchar(5),
-	ti_arrivalstation varchar(20),
+    ti_seq            integer not null,
+	ti_arrivalstation varchar(20) not null,
 	ti_arrivaltime    time default time '00:00:00',
     -- 后续考虑arrival和departure时间恰好分属两天的情况
 	ti_departuretime  time default time '00:00:00',
