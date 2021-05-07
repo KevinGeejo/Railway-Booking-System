@@ -28,13 +28,17 @@ create table trainitems(
 	ti_arrivaltime    time default time '00:00:00',
     -- 后续考虑arrival和departure时间恰好分属两天的情况
 	ti_departuretime  time default time '00:00:00',
-	ti_sslprice       float  default 0,
-	ti_ssuprice       float  default 0,
-	ti_hslprice       float  default 0,
-	ti_hsmprice       float  default 0,
-	ti_hsuprice       float  default 0,
-	ti_sseprice       float  default 0,
+    -- 硬座
 	ti_hseprice       float  default 0,
+    -- 软座
+	ti_sseprice       float  default 0,
+    -- 硬卧 上-中-下
+	ti_hsuprice       float  default 0,
+	ti_hsmprice       float  default 0,
+    ti_hslprice       float  default 0,
+    -- 软卧 上-下
+	ti_ssuprice       float  default 0,
+	ti_sslprice       float  default 0,
 	primary key(ti_tid, ti_arrivalstation),
 	foreign key(ti_arrivalstation) references stations(s_stationname)
 	);
