@@ -46,9 +46,6 @@ create table trainitems(
 	foreign key(ti_arrivalstation) references stations(s_stationname)
 	);
 
-create type seat_t as enum ('ssl','ssu','hsl','hsm','hsu','sse', 'hse');
-create type stat_t as enum ('cancelled', 'expired', 'valid');
-
 create table orders(
 	o_oid              char(15) primary key,
 	o_idnumber         char(18) not null,
