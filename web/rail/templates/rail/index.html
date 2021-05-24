@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>主页</title>
+</head>
+<body>
+
+{% if answer_city_list %}
+    <ul>
+        {% for station in answer_city_list %}
+            <li><a href="/rail/{{ station.id }}/">{{ station.s_stationname }}</a></li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
+
+</body>
+</html>

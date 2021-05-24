@@ -21,7 +21,7 @@ class AuthPermission(models.Model):
 
 class AuthUser(models.Model):
     password = models.CharField(max_length=128)
-    last_login = models.DateTimeField(blank=True, null=True)
+    last_login = models.DateTimeField(blank=True)
     is_superuser = models.BooleanField()
     username = models.CharField(unique=True, max_length=150)
     first_name = models.CharField(max_length=150)
@@ -60,11 +60,11 @@ class AuthUserUserPermissions(models.Model):
 
 class DjangoAdminLog(models.Model):
     action_time = models.DateTimeField()
-    object_id = models.TextField(blank=True, null=True)
+    object_id = models.TextField(blank=True)
     object_repr = models.CharField(max_length=200)
     action_flag = models.SmallIntegerField()
     change_message = models.TextField()
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, blank=True, null=True)
+    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, blank=True)
     user = models.ForeignKey(AuthUser, models.DO_NOTHING)
 
     class Meta:
@@ -110,13 +110,16 @@ class Orders(models.Model):
     o_departuredate = models.DateField()
     o_departuretime = models.TimeField()
     o_seattype = models.TextField()  # This field type is a guess.
-    o_orderstatus = models.TextField(blank=True, null=True)  # This field type is a guess.
+    o_orderstatus = models.TextField(blank=True)  # This field type is a guess.
     o_departurestation = models.CharField(max_length=20)
     o_arrivalstation = models.CharField(max_length=20)
 
     class Meta:
         managed = False
         db_table = 'orders'
+
+    def __str__(self):
+        return self.o_oid
 
 
 class Stations(models.Model):
@@ -127,25 +130,31 @@ class Stations(models.Model):
         managed = False
         db_table = 'stations'
 
+    def __str__(self):
+        return self.s_stationname
+
 
 class Trainitems(models.Model):
     ti_tid = models.CharField(primary_key=True, max_length=5)
     ti_seq = models.IntegerField()
     ti_arrivalstation = models.ForeignKey(Stations, models.DO_NOTHING, db_column='ti_arrivalstation')
-    ti_arrivaltime = models.TimeField(blank=True, null=True)
-    ti_departuretime = models.TimeField(blank=True, null=True)
-    ti_hseprice = models.FloatField(blank=True, null=True)
-    ti_sseprice = models.FloatField(blank=True, null=True)
-    ti_hsuprice = models.FloatField(blank=True, null=True)
-    ti_hsmprice = models.FloatField(blank=True, null=True)
-    ti_hslprice = models.FloatField(blank=True, null=True)
-    ti_ssuprice = models.FloatField(blank=True, null=True)
-    ti_sslprice = models.FloatField(blank=True, null=True)
+    ti_arrivaltime = models.TimeField(blank=True)
+    ti_departuretime = models.TimeField(blank=True)
+    ti_hseprice = models.FloatField(blank=True)
+    ti_sseprice = models.FloatField(blank=True)
+    ti_hsuprice = models.FloatField(blank=True)
+    ti_hsmprice = models.FloatField(blank=True)
+    ti_hslprice = models.FloatField(blank=True)
+    ti_ssuprice = models.FloatField(blank=True)
+    ti_sslprice = models.FloatField(blank=True)
 
     class Meta:
         managed = False
         db_table = 'trainitems'
         unique_together = (('ti_tid', 'ti_arrivalstation'),)
+
+    def __str__(self):
+        return self.ti_tid
 
 
 class Users(models.Model):
@@ -158,3 +167,6 @@ class Users(models.Model):
     class Meta:
         managed = False
         db_table = 'users'
+
+    def __str__(self):
+        return self.u_idnumber
