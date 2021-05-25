@@ -1,12 +1,13 @@
 clear;
 add = '/Users/birdpeople/classObject/DB/train/';
 file = {'0';'g';'t';'c';'k';'y';'z';'d'}';
-%file = {'0';'g'}';
+%file = {'0';}';
 for this = 1:size(file,2)
 address = strcat(add,file{this},'/');
 File = dir(fullfile(address,'*.csv'));
 FileNames = {File.name}';
 Length_Names = size(FileNames,1); 
+
 
 global B;
 for i = 1:Length_Names
@@ -25,14 +26,15 @@ for i = 1:Length_Names
              C(index,:) = CC(ii,:);index = index+1;
          end
      end
+     % valid data already
      
      mnptime(B);
      
     
-     D = [B(2:end,[1,2,3,4]),C(2:end,:)];
+     D = [B(1:end,[1,2,3,4]),C(1:end,:)];
      g = strsplit(FileNames{i},'.');
-     E = string(zeros(size(B,1)-1,1));
-     for col = 1:(size(B,1)-1)
+     E = string(zeros(size(B,1),1));
+     for col = 1:(size(B,1))
          E(col,1) = g{1}; 
      end
      
@@ -60,7 +62,7 @@ end
  Fu = string([]);inde = 1;
    
     for m = 1: size(Final,1)
-        if ~(Final(m,6) == '0' && Final(m,7) == '0' && Final(m,8) == '0' && Final(m,9) == '0' && Final(m,10) == '0' && Final(m,11) == '0' && Final(m,12) == '0')
+        if ~(Final(m,4) ~= Final(m,5) && Final(m,6) == '0' && Final(m,7) == '0' && Final(m,8) == '0' && Final(m,9) == '0' && Final(m,10) == '0' && Final(m,11) == '0' && Final(m,12) == '0')
             Fu(inde,:) = Final(m,:); inde = inde + 1;
         end
     end
@@ -76,8 +78,9 @@ global B;
 for i = 1: size(B,1)
     B(i,3) = strcat(B(i,3),':00');
     B(i,4) = strcat(B(i,4),':00');
-    B(end,4) = "00:00:00";
 end
+    B(1,3) = B(1,4);
+    B(end,4) = "00:00:00";
 end
 
 function C = getSeat(B)
