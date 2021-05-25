@@ -5,16 +5,24 @@
 # @FileName: urls.py
 # @Software: PyCharm
 
-from django.urls import path
+from django.urls import path, re_path
 
 from . import views
 
 urlpatterns = [
     # 例如: /polls/
-    # path('', views.index, name='index'),
+    path('', views.index, name='index'),
 
     # test
-    path('', views.query_for_stations_in_city_test, name='query_for_stations_in_city_test'),
+    # path('', views.query_for_stations_in_city_test, name='query_for_stations_in_city_test'),
+
+    path('findStationsInCity/',
+         views.findStationsInCity,
+         name="findStationInCity"),
+
+    re_path(r'^findStationsInCity/findStationsInCityAnswer/',
+            views.findStationsInCityAnswer,
+            name='findStationsInCityAnswer'),
 
     # # 例如: /polls/
     # path('', views.index, name='index'),

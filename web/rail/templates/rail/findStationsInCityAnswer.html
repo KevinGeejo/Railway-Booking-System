@@ -1,0 +1,27 @@
+{% if error_msg %}
+    <p>{{ error_msg }}</p>
+{% endif %}
+
+{% for station in station_list %}
+    <ul>
+        <li>
+            <a href="/rail/{{ station.id }}/">
+                {{ station.s_stationname }}
+            </a>
+        </li>
+    </ul>
+{% empty %}
+    <div class="no-station">
+        没有搜索到符合条件的车站
+    </div>
+{% endfor %}
+
+{#{% if answer_city_list %}#}
+{#    <ul>#}
+{#        {% for station in answer_city_list %}#}
+{#            <li><a href="/rail/{{ station.id }}/">{{ station.s_stationname }}</a></li>#}
+{#        {% endfor %}#}
+{#    </ul>#}
+{#{% else %}#}
+{#    <p>No polls are available.</p>#}
+{#{% endif %}#}

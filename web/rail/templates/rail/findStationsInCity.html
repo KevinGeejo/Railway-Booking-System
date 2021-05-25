@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>城市-车站查询</title>
+</head>
+
+<body>
+
+{#<!--查询目录-->#}
+{#<!--如果您点击提交，表单数据会被发送到名为 demo_form.asp 的页面。-->#}
+{#<html>#}
+{#<body>#}
+{#<h1 align="center">车站->城市</h1>#}
+{#<form action="/demo/demo_form.asp">#}
+{#车站:<input type="text" name = "城市" >#}
+{#<br>#}
+{#<input type="submit" value="Submit">#}
+{#</form>#}
+{#</body>#}
+{#</html>#}
+
+<form method="get" action="findStationsInCityAnswer/">
+    {% csrf_token %}
+    <label>
+        <input type="search" placeholder="查询" required>
+    </label>
+    <button type="submit">查询</button>
+</form>
+
+
+</body>
+
+</html>

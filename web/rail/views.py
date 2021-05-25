@@ -8,7 +8,41 @@ from django.template import loader
 from .models import Stations
 
 
-def query_for_stations_in_city_test(request):
+def index(request):
+    pass
+    return render(request, 'rail/welcome.html')
+
+
+def findStationsInCity(request):
+    pass
+    return render(request, 'rail/findStationsInCity.html')
+
+
+def findStationsInCityAnswer(request):
+    q = request.GET.get('q')
+    error_msg = ''
+
+    if not q:
+        error_msg = '查询不成功!'
+        return render(request,
+                      'rail/errors.html',
+                      {'error_msg': error_msg
+                       })
+
+    station_list = Stations.objects.filter(s_city=q)
+    return render(request,
+                  'rail/findStationsInCityAnswer.html',
+                  {'error_msg': error_msg,
+                   'stationList': station_list
+                   })
+
+
+'''
+-----------BELOW ARE TEST-----------
+'''
+
+
+def query_for_stations_in_city_static(request):
     answer_city_list = Stations.objects.filter(s_city="北京")
 
     # test: print stations
@@ -16,7 +50,7 @@ def query_for_stations_in_city_test(request):
     # return HttpResponse(output)
 
     context = {'answer_city_list': answer_city_list}
-    return render(request, 'rail/query_for_stations_in_city_test.html', context)
+    return render(request, 'rail/findStationsInCity.html', context)
 
 # # 注意函数的参数
 # def detail(request, question_id):
