@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
 
+from django.db import connection
 from .models import Stations
 
 
@@ -29,7 +30,25 @@ def findStationsInCityAnswer(request):
                       {'error_msg': error_msg
                        })
 
-    station_list = list(Stations.objects.filter(s_city=q).values('s_city', 's_stationname'))
+    # orm method
+    # station_list = list(Stations.objects.filter(s_city=q).values('s_city', 's_stationname'))
+
+    # raw sql
+    # station_list = list(Stations.objects.raw("select s_stationname from stations where s_city=%s;", [q]))
+
+    # using connect
+
+    station_list = []
+    # print(q)
+    cursor = connection.cursor()
+    try:
+        # cursor.execute("select s_stationname from stations where s_city= %s;", [q])
+        cursor.execute("select city_to_station(%s)", [q])
+        station_list = cursor.fetchall()
+    except Exception as e:
+        cursor.close()
+
+    station_list = [s[0] for s in station_list]
     print(station_list)
     return render(request,
                   'rail/findStationsInCityAnswer.html',
