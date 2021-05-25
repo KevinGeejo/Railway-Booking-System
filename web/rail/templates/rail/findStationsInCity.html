@@ -23,8 +23,8 @@
 
 <form method="get" action="findStationsInCityAnswer/">
     {% csrf_token %}
-    <label>
-        <input type="search" placeholder="查询" required>
+    <label for="stations">
+        <input type="search" name="stations" id="stations" placeholder="查询" required>
     </label>
     <button type="submit">查询</button>
 </form>

@@ -19,7 +19,7 @@ def findStationsInCity(request):
 
 
 def findStationsInCityAnswer(request):
-    q = request.GET.get('q')
+    q = request.GET.get('stations')
     error_msg = ''
 
     if not q:
@@ -29,11 +29,12 @@ def findStationsInCityAnswer(request):
                       {'error_msg': error_msg
                        })
 
-    station_list = Stations.objects.filter(s_city=q)
+    station_list = list(Stations.objects.filter(s_city=q).values('s_city', 's_stationname'))
+    print(station_list)
     return render(request,
                   'rail/findStationsInCityAnswer.html',
                   {'error_msg': error_msg,
-                   'stationList': station_list
+                   'station_list': station_list
                    })
 
 
