@@ -1,12 +1,9 @@
+{% extends "base_RAIL.html" %}
 <!--导航/欢迎-->
-<!DOCTYPE html>
-<html lang="zh-CN">
 
-<head>
-    <meta charset="UTF-8">
-    <title>导航</title>
-</head>
-<body>
+{% block title %}导航{% endblock %}
+
+{% block content %}
 <h1 style="text-align: center">欢迎光临小破站订票网</h1>
 <form style="text-align: center">
     <a href="./query_for_tid_demand_four.html">具体车次查询</a>
@@ -17,6 +14,4 @@
     <br><br>
     <a href="./findStationsInCity/">城市-车站查询</a>
 </form>
-</body>
-
-</html>
+{% endblock %}

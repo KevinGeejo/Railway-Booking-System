@@ -1,30 +1,26 @@
-{% if error_msg %}
-    <p>{{ error_msg }}</p>
-{% endif %}
+{% extends "base_RAIL.html" %}
+{% block title %}
+    城市-车站查询: 结果
+{% endblock %}
 
-{% for station in station_list %}
-    <ul>
-        <li>
-            {# {{ station.s_stationname }}#}
-            {{ station }}
-        </li>
-    </ul>
-{% empty %}
-    <div class="no-station">
-        没有搜索到符合条件的车站
-    </div>
-{% endfor %}
+{% block h1-title %}
+    查到以下车站位于{{ ask_city }}:
+{% endblock %}
 
-{#{% if answer_city_list %}#}
-{#    <ul>#}
-{#        {% for station in answer_city_list %}#}
-{#            <li>#}
-{#                <a href="/rail/{{ station.id }}/">#}
-{#                {{ station.s_stationname }}#}
-{#            </a>#}
-{#            </li>#}
-{#        {% endfor %}#}
-{#    </ul>#}
-{#{% else %}#}
-{#    <p>No polls are available.</p>#}
-{#{% endif %}#}
+{% block content %}
+    {% if error_msg %}
+        <p>{{ error_msg }}</p>
+    {% endif %}
+
+    {% for station in station_list %}
+        <ul>
+            <li>
+                {{ station }}
+            </li>
+        </ul>
+    {% empty %}
+        <div class="no-station">
+            抱歉, 没有搜索到符合条件的车站.
+        </div>
+    {% endfor %}
+{% endblock %}

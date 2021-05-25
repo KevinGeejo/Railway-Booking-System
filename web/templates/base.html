@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    {#  <link rel="stylesheet" href="style.css" />#}
+    <title>
+        {% block title %}
+
+        {% endblock %}
+    </title>
+</head>
+
+<body>
+<div id="sidebar">
+    {% block sidebar %}
+        <ul>
+            <li><a href="/">Home</a></li>
+            {# <li><a href="/rail">Rail</a></li>#}
+        </ul>
+    {% endblock %}
+</div>
+
+<div id="content">
+    <h1>
+        {% block h1-title %}
+
+        {% endblock %}
+    </h1>
+
+    {% block content %}
+
+    {% endblock %}
+</div>
+</body>
+
+<div id="footer">
+    {% block footer %}
+
+    {% endblock %}
+</div>
+
+</html>

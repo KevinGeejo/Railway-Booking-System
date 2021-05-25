@@ -17,9 +17,16 @@ from django.contrib import admin
 from django.urls import path, include
 
 from . import views
+from login import views as login_views
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', views.index),
+    # path('', views.index, name='index'),
     path('rail/', include('rail.urls')),
     path('admin/', admin.site.urls),
+
+    # path('index/', views.index),
+    path('login/', login_views.login),
+    path('register/', login_views.register),
+    path('logout/', login_views.logout),
 ]

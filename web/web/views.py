@@ -1,5 +1,8 @@
 from django.http import HttpResponse
+from django.shortcuts import render, redirect
 
 
 def index(request):
-    return HttpResponse("这里是火车站")
+    pass
+    return redirect("/login/")
+

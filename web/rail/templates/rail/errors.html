@@ -1,20 +1,13 @@
-<!--出错-->
-<!DOCTYPE html>
-<html lang="zh-CN">
+{% extends "base_RAIL.html" %}
+{% block title %}
+    似乎出错了?
+{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>错误</title>
-</head>
-<body>
-<h1 style="text-align: center">
-    好像有点问题
-</h1>
+
+{% block content %}
 <form style="text-align: center">
     <a href="/rail">
         返回主页
     </a>
 </form>
-</body>
-
-</html>
+{% endblock %}

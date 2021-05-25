@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{#{% extends 'base_LOGIN.html' %}#}
+
+{% block title %}
+    用户登录
+{% endblock %}
+
+{% block h1-title %}
+    在此登录
+{% endblock %}
+
+{% block content %}
+    <form class="form-login" action="/login/" method="post">
+        {% csrf_token %}
+        <h3 class="text-center">欢迎登录</h3>
+        <div class="form-group">
+            <label for="id_username">用户名：</label>
+            <input type="text" name='username'
+                   class="form-control" id="id_username"
+                   placeholder="Username"
+                   autofocus required>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary float-right">登录</button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block footer %}
+    <a href="/register/">未注册? 点此注册.</a>
+{% endblock %}
