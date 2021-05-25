@@ -1,14 +1,36 @@
-<!--用户注册-->
-<html>
+<!--查询具体车次-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>具体车次查询</title>
+</head>
+
 <body>
-<h1 align="center">具体车次查询</h1>
-<form action="/demo/demo_form.asp">
-车次序号:<input type="text" name = "车次序号" >
-<br>
-日期:<input type="text" name = "日期" >
-<br>
-<input type="submit" value="查询"></form>
+<h1 style="text-align:center">
+    具体车次查询
+</h1>
+<!--TODO: action-->
+<form style="text-align:center">
+    <label for="tid">
+        车次
+    </label>
+    <input type="text" name="tid" id="tid">
+    <br>
+    <br>
+    <label for="departure_date">
+        出发日期
+    </label>
+    <input type="date" name="departure_date" id="departure_date">
+    <br>
+    <br>
+    <input type="submit" value="查询">
 </form>
-<a href="file:///C:/Users/hp/Desktop/破破的html/欢迎主页.html">返回</a>
+
+<p style="text-align:right">
+<a href="./welcome.html">返回导航</a>
+</p>
+
 </body>
 </html>

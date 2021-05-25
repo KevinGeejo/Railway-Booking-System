@@ -8,7 +8,7 @@ from django.template import loader
 from .models import Stations
 
 
-def index(request):
+def query_for_stations_in_city_test(request):
     answer_city_list = Stations.objects.filter(s_city="北京")
 
     # test: print stations
@@ -16,7 +16,7 @@ def index(request):
     # return HttpResponse(output)
 
     context = {'answer_city_list': answer_city_list}
-    return render(request, 'rail/index.html', context)
+    return render(request, 'rail/query_for_stations_in_city_test.html', context)
 
 # # 注意函数的参数
 # def detail(request, question_id):

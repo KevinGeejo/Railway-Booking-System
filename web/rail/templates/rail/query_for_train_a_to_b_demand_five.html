@@ -1,19 +1,47 @@
-<!--用户注册-->
-<html>
+<!--查询两地之间车次-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>查询两地之间的车次</title>
+</head>
+
 <body>
-<h1 align="center">查询两地之间的车次</h1>
-<form action="/demo/demo_form.asp">
-出发城市名:<input type="text" name = "出发城市名" >
-<br>
-到达城市名:<input type="text" name = "到达城市名" >
-<br>
-出发日期:<input type="date" name = "出发日期" >
-<br>
-出发时间:<input type="time" name = "出发时间" >
-<br>
-<input type="submit" value="查询"></form>
+<h1 style="text-align:center">
+    查询两地之间的车次
+</h1>
+<!--TODO: action-->
+<form action="/demo/demo_form.asp" style="text-align:center">
+    <label for="departure_city">
+        出发城市:
+    </label>
+    <input type="text" name="departure_city" id="departure_city">
+    <br>
+    <br>
+
+    <label for="arrival_city">
+        到达城市:
+    </label>
+    <input type="text" name="arrival_city" id="arrival_city">
+    <br>
+    <br>
+
+    <label for="departure_date">
+        出发日期:
+    </label>
+    <input type="date" name="departure_date" id="departure_date">
+    <br>
+    <br>
+
+    <input type="submit" value="查询">
 </form>
-<a href="file:///C:/Users/hp/Desktop/破破的html/欢迎主页.html">返回</a>
-<a href="file:///C:/Users/hp/Desktop/破破的html/查询两地之间的车次.html">返程查询链接</a>
+
+<p style="text-align:right">
+<a href="./welcome.html">返回导航</a>
+<a href="./query_for_train_a_to_b_demand_five.html">查询返程</a>
+</p>
+
 </body>
+
 </html>
