@@ -8,8 +8,10 @@
 {% endblock %}
 
 {% block content %}
-
-    <form method="get" action="findStationsInCityAnswer/">
+    {% if error_msg %}
+        <p>{{ error_msg }}</p>
+    {% endif %}
+    <form method="get" action="findStationsInCity/">
         {% csrf_token %}
         <label for="stations">
             <input type="search"
@@ -21,4 +23,22 @@
         <button type="submit">查询</button>
     </form>
 
+{% endblock %}
+
+{% block answer %}
+    {% if station_list %}
+        查到以下车站位于{{ ask_city }}:
+        <br>
+        {% for station in station_list %}
+            <ul>
+                <li>
+                    {{ station }}
+                </li>
+            </ul>
+        {% empty %}
+            <div class="no-station">
+                抱歉, 没有搜索到符合条件的车站.
+            </div>
+        {% endfor %}
+    {% endif %}
 {% endblock %}

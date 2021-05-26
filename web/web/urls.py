@@ -17,7 +17,8 @@ from django.contrib import admin
 from django.urls import path, include
 
 from . import views
-from login import views as login_views
+import login.views as login_views
+import rail.views as rail_views
 
 urlpatterns = [
     path('', views.index),

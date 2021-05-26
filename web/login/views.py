@@ -6,14 +6,14 @@ from . import forms
 # Create your views here.
 
 def index(request):
-    if not request.session.get('is_login', None):
+    if not request.session.get('user_stat', None):
         return redirect("/login/")
     return redirect("/rail/")
 
 
 def login(request):
     # 不允许重复登陆
-    if request.session.get('is_login', None):
+    if request.session.get('user_stat', None):
         return redirect("/rail/")
 
     if request.method == "POST":
@@ -28,7 +28,7 @@ def login(request):
                               'login/login.html',
                               {'message': message})
 
-            request.session['is_login'] = True
+            request.session['user_stat'] = True
             request.session['user_name'] = user.u_name
             request.session['user_id'] = user.u_idnumber
             return redirect('/rail/')
@@ -37,8 +37,7 @@ def login(request):
 
 
 def register(request):
-    # TODO: 注册, 插入用户
-    if request.session.get('is_login', None):
+    if request.session.get('user_stat', None):
         return redirect('/index/')
     if request.method == 'POST':
         username = request.POST.get('u_username')
@@ -46,13 +45,6 @@ def register(request):
         creditcard = request.POST.get('u_creditcard')
         phone = request.POST.get('u_phone')
         idnumber = request.POST.get('u_idnumber')
-
-        # register_form = forms.RegisterForm(request.POST)
-        # username = register_form.cleaned_data.get('u_username')
-        # name = register_form.cleaned_data.get('u_name')
-        # idnumber = register_form.cleaned_data.get('u_idnumber')
-        # creditcard = register_form.cleaned_data.get('u_creditcard')
-        # phone = register_form.cleaned_data.get('u_phone')
 
         message = '请检查您填写的内容是否符合要求!'
 
@@ -93,7 +85,7 @@ def register(request):
 
 
 def logout(request):
-    if not request.session.get('is_login', None):
+    if not request.session.get('user_stat', None):
         # 如果本来就未登录，也就没有登出一说
         return redirect("/login/")
     request.session.flush()

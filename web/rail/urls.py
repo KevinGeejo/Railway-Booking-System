@@ -16,13 +16,10 @@ urlpatterns = [
     # test
     # path('', views.query_for_stations_in_city_test, name='query_for_stations_in_city_test'),
 
-    path('findStationsInCity/',
+
+    re_path(r'^findStationsInCity/',
          views.findStationsInCity,
          name="findStationInCity"),
-
-    re_path(r'^findStationsInCity/findStationsInCityAnswer/',
-            views.findStationsInCityAnswer,
-            name='findStationsInCityAnswer'),
 
     # # 例如: /polls/
     # path('', views.index, name='index'),
