@@ -26,19 +26,19 @@
 {% endblock %}
 
 {% block answer %}
-{% if station_list %}
-查到以下车站位于{{ ask_city }}:
-<br>
-{% for station in station_list %}
-    <ul>
-        <li>
-            {{ station }}
-        </li>
-    </ul>
-{% empty %}
-    <div class="no-station">
-        抱歉, 没有搜索到符合条件的车站.
-    </div>
-{% endfor %}
-{% endif %}
+    {% if station_list %}
+        查到以下车站位于{{ ask_city }}:
+        <br>
+        {% for station in station_list %}
+            <ul>
+                <li>
+                    {{ station }}
+                </li>
+            </ul>
+        {% empty %}
+            <div class="no-station">
+                抱歉, 没有搜索到符合条件的车站.
+            </div>
+        {% endfor %}
+    {% endif %}
 {% endblock %}
