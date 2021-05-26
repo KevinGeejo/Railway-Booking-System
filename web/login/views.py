@@ -46,8 +46,15 @@ def register(request):
         creditcard = request.POST.get('u_creditcard')
         phone = request.POST.get('u_phone')
         idnumber = request.POST.get('u_idnumber')
+
+        # register_form = forms.RegisterForm(request.POST)
+        # username = register_form.cleaned_data.get('u_username')
+        # name = register_form.cleaned_data.get('u_name')
+        # idnumber = register_form.cleaned_data.get('u_idnumber')
+        # creditcard = register_form.cleaned_data.get('u_creditcard')
+        # phone = register_form.cleaned_data.get('u_phone')
+
         message = '请检查您填写的内容是否符合要求!'
-        print("no id" if not idnumber else idnumber)
 
         # 检验重复
         same_username_user = rail.models.Users.objects.filter(

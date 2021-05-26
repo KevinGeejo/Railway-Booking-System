@@ -27,13 +27,11 @@
                     <input type="text" class="form-control"
                            id="u_username" name="u_username"
                            required>
-{#                    {{ register_form.u_username.label_tag }}#}
-{#                      {{ register_form.u_username}}#}
                 </div>
                 <div class="form-group">
-                    <label for="u_identitycard">身份证</label>
+                    <label for="u_idnumber">身份证</label>
                     <input type="text" class="form-control"
-                           id="u_identitycard" name="u_identitycard"
+                           id="u_idnumber" name="u_idnumber"
                            required>
                 </div>
                 <div class="form-group">
@@ -54,6 +52,9 @@
                            id="u_creditcard" name="u_creditcard"
                            required>
                 </div>
+                {#                <div class="form-group">#}
+                {#                    {{ register_form }}#}
+                {#                </div>#}
                 <div>
                     <button type="submit" class="btn btn-primary float-right">
                         注册
