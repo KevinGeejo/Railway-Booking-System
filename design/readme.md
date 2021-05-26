@@ -77,7 +77,7 @@
 
 **候选键**：(Tid, StartStation, ArrivalStation)
 
-**非键属性**：ArrivalTime, DepartureTime, HardSealPrice, SoftSeatPrice, HardSleeperUPrice, HardSleeperMprice, HardSleeperLPrice, SoftSleeperUPrice, SoftSleeperLPrice.
+**非键属性**：ArrivalTime, DepartureTime, HardSealPrice, SoftSeatPrice, HardSleeperUPrice, HardSleeperMprice, HardSleeperLPrice, SoftSleeperUPrice, SoftSleeperLPrice, OffsetDay.
 
 **依赖关系**：
 
@@ -143,6 +143,7 @@
 - HardSleeperUPrice: 硬卧上铺票价
 - SoftSeatPrice: 软座票价
 - HardSeatPrice: 硬座票价
+- OffsetDay: 中间车站与始发站的时间
 
 #### TrainStartStation/ 车次始发站
 
@@ -197,6 +198,7 @@ create table trainitems(
 	ti_hsuprice       float  default 0,
 	ti_sseprice       float  default 0,
 	ti_hseprice       float  default 0,
+  ti_offsetday      integer default 0,
 	primary key(ti_tid, ti_arrivalstation),
 	foreign key(ti_arrivalstation) references stations(s_stationname)
 	);
@@ -215,7 +217,7 @@ create table orders(
 	o_departurestation varchar(20) not null,
 	o_arrivalstation   varchar(20) not null,
 	foreign key(o_idnumber) references users(u_idnumber),
-    foreign key(o_tid, o_arrivalstation) references trainitems(ti_tid, ti_arrivalstation)
+  foreign key(o_tid, o_arrivalstation) references trainitems(ti_tid, ti_arrivalstation)
 	);
 ```
 
