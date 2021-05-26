@@ -3,3 +3,4 @@ train-*
 .idea*
 .vscode*
 ref*
+.DS_*

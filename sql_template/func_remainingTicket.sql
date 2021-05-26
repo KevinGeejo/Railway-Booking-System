@@ -52,13 +52,10 @@ $$ LANGUAGE plpgsql;
 
 
 -- function remaining_ticket()
-create or replace function remaining_ticket(tid varchar(5), order_date date, seat_type seat_t)
-returns table(
-    seq integer,
-    arrival_station varchar(20),
-    Remaining bigint
-             )
-as $$
+create function remaining_ticket(tid character varying, order_date date, seat_type seat_t)
+    returns TABLE(seq integer, arrival_station character varying, remaining bigint)
+as
+$$
 begin
 return query
 (select
@@ -163,8 +160,8 @@ where
 group by trainitem.ti_seq,trainitem.ti_arrivalstation
 order by trainitem.ti_seq,trainitem.ti_arrivalstation);
 end
-$$
-language plpgsql volatile;
+$$ language plpgsql;
+
 
 -- select e.g.
 select remaining_ticket('1095', date '2021-5-24', 'sse');

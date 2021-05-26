@@ -32,6 +32,7 @@ create table trainitems(
     -- 软卧 上-下
 	ti_ssuprice       float  default 0,
 	ti_sslprice       float  default 0,
+	ti_offsetday      integer default 0,
 	primary key(ti_tid, ti_arrivalstation),
 	foreign key(ti_arrivalstation) references stations(s_stationname)
 	);
