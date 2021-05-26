@@ -85,6 +85,9 @@ def register(request):
         new_user.u_idnumber = idnumber
         new_user.u_creditcard = creditcard
         new_user.save()
+        return render(request,
+                      "login/login.html",
+                      {'message': '注册成功, 请登录.'})
 
     return render(request, 'login/register.html')
 
