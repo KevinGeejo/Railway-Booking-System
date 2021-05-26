@@ -19,22 +19,37 @@
         </label>
         <input type="text" name="tid" id="tid" value={{ tid }}>
         <br> <br>
+
         <label for="start_station">
             出发车站
         </label>
         <input type="text" name="start_station" id="start_station" value={{ starter }}>
         <br> <br>
+
         <label for="terminal_station">
             到达车站
         </label>
         <input type="text" name="terminal_station" id="terminal_station" value={{ terminal }}>
         <br> <br>
+
         <label for="departure_date">
             出发日期
         </label>
         <input type="date" name="departure_date" id="departure_date" value={{ date }}>
         <br> <br>
-        <input type="submit" value="购票">
+
+        <label for="seattype">
+            座位种类&nbsp;
+        </label>
+        <input type="radio" name="seattype" id="seattype" value="ssl">软卧(下)
+        <input type="radio" name="seattype" id="seattype" value="ssu">软卧(上)
+        <input type="radio" name="seattype" id="seattype" value="hsl">硬卧(下)
+        <input type="radio" name="seattype" id="seattype" value="hsm">硬卧(中)
+        <input type="radio" name="seattype" id="seattype" value="hsu">硬卧(上)
+        <input type="radio" name="seattype" id="seattype" value="sse">软座
+        <input type="radio" name="seattype" id="seattype" value="hse">硬座
+        <br><br>
+        <input type="submit" value="购票" >
     </form>
     <br>
 {% endblock %}

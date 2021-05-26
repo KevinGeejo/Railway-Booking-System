@@ -25,6 +25,10 @@ def index(request):
     user_stat = request.session.get('user_stat', default=False)
 
     request.session['new_question'] = True
+    try:
+        del request.session['seattype']
+    except:
+        pass
 
     return render(request,
                   'rail/welcome.html',
@@ -46,17 +50,25 @@ def BookingTicket(request):
     tid = request.session.get('tid', '')
     starter = request.session.get('starter', '')
     date = request.session.get('departure_date', '')
-    # TODO
-    seattype = request.session.get('seattype', 'hse')
+    seattype = request.session.get('seattype', '')
+    terminal = request.session['terminal']
 
     if request.method == 'POST':
-        terminal = request.POST.get('terminal')
+        if not terminal:
+            terminal = request.POST.get('terminal')
+        request.session['terminal'] = terminal
+        if not seattype:
+            seattype = request.POST.get('seattype')
+        request.session['seattype'] = seattype
 
-        if (not tid or not starter or not terminal
+        if (
+                not tid
+                or not starter
+                or not terminal
                 or not date
-                # or not seattype
+                or not seattype
         ):
-            error_msg = '抱歉, 缺少信息, 请您检查后重新提交'
+            error_msg = '抱歉, 该座无票或缺少信息, 请您检查后重新提交'
             return render(request,
                           'rail/BookingTicket.html',
                           locals())
@@ -73,7 +85,7 @@ def BookingTicket(request):
             c.execute(
                 '''
                 insert into orders values(
-                %s,%s,%s, %s,%s,%s,%s,%s,%s);
+                %s,%s,%s,%s,%s,%s,%s,%s,%s);
                 ''',
                 [
                     oid,
@@ -116,6 +128,10 @@ TODO:
 
 
 def AskTid(request):
+    try:
+        del request.session['seattype']
+    except:
+        pass
     user_name = request.session.get('user_name', default='')
     user_id = request.session.get('user_id', default='')
     user_stat = request.session.get('user_stat', default=False)
@@ -145,11 +161,22 @@ def AskTid(request):
             Trainitems.objects.filter(
                 ti_tid=input_tid
             ).order_by('ti_seq'))
-        starter = tid_info[0]
-        request.session['starter'] = str(starter.ti_arrivalstation)
-        terminal = tid_info[-1]
-        request.session['terminal'] = str(terminal.ti_arrivalstation)
-        mids = tid_info[1:-2]
+        try:
+            starter = tid_info[0]
+            request.session['starter'] = str(starter.ti_arrivalstation)
+        except:
+            pass
+
+        try:
+            terminal = tid_info[-1]
+            request.session['terminal'] = str(terminal.ti_arrivalstation)
+        except:
+            pass
+
+        try:
+            mids = tid_info[1:-2]
+        except:
+            pass
 
     return render(request,
                   'rail/AskTid.html',
