@@ -11,7 +11,13 @@ from .models import Stations
 
 def index(request):
     pass
-    return render(request, 'rail/welcome.html')
+    # return render(request, 'rail/welcome.html')
+    user_name = request.session.get('user_name', default='')
+    user_id = request.session.get('user_id', default='')
+    return render(request,
+                  'rail/welcome.html',
+                  {'user_name': user_name,
+                   'user_id': user_id})
 
 
 def findStationsInCity(request):
