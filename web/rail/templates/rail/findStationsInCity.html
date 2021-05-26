@@ -12,7 +12,7 @@
         <p>{{ error_msg }}</p>
     {% endif %}
 
-    <form method="get" action="findStationsInCity/">
+    <form method="get" action="/rail/findStationsInCity/">
         {% csrf_token %}
         <label for="city">
             <input type="search"
