@@ -38,19 +38,21 @@
     {% if tid_info %}
         {{ ask_tid }} 次列车的信息:
         <br>
-        <table style="border-bottom-width: thin">
+        <table
+                style="border-width: medium; border-style: solid;"
+                border="1">
             <tr>
                 {# 表头 #}
-                <td>站名</td>
-                <td>到站时间</td>
-                <td>离站时间</td>
-                <td>软卧(上铺) / 元</td>
-                <td>软卧(下铺) / 元</td>
-                <td>硬卧(下铺) / 元</td>
-                <td>硬卧(中铺) / 元</td>
-                <td>硬卧(上铺) / 元</td>
-                <td>软座 / 元</td>
-                <td>硬座 / 元</td>
+                <th>站名</th>
+                <th>到站时间</th>
+                <th>离站时间</th>
+                <th>软卧(上铺) / 元</th>
+                <th>软卧(下铺) / 元</th>
+                <th>硬卧(下铺) / 元</th>
+                <th>硬卧(中铺) / 元</th>
+                <th>硬卧(上铺) / 元</th>
+                <th>软座 / 元</th>
+                <th>硬座 / 元</th>
             </tr>
 
             {# 始发站 #}
@@ -98,22 +100,22 @@
 
             {# 终到站 #}
             <tr>
-                    <td>{{ terminal.ti_arrivalstation }}</td>
-                    <td>
-                        {{ terminal.ti_arrivaltime }}
-                        {% if terminal.ti_offsetday %}
-                            (+{{ terminal.ti_offsetday }})
-                        {% endif %}
-                    </td>
-                    <td>-</td>
-                    <td>{{ terminal.ti_sslprice }}</td>
-                    <td>{{ terminal.ti_ssuprice }}</td>
-                    <td>{{ terminal.ti_hslprice }}</td>
-                    <td>{{ terminal.ti_hsmprice }}</td>
-                    <td>{{ terminal.ti_hsuprice }}</td>
-                    <td>{{ terminal.ti_sseprice }}</td>
-                    <td>{{ terminal.ti_hseprice }}</td>
-                </tr>
+                <td>{{ terminal.ti_arrivalstation }}</td>
+                <td>
+                    {{ terminal.ti_arrivaltime }}
+                    {% if terminal.ti_offsetday %}
+                        (+{{ terminal.ti_offsetday }})
+                    {% endif %}
+                </td>
+                <td>-</td>
+                <td>{{ terminal.ti_sslprice }}</td>
+                <td>{{ terminal.ti_ssuprice }}</td>
+                <td>{{ terminal.ti_hslprice }}</td>
+                <td>{{ terminal.ti_hsmprice }}</td>
+                <td>{{ terminal.ti_hsuprice }}</td>
+                <td>{{ terminal.ti_sseprice }}</td>
+                <td>{{ terminal.ti_hseprice }}</td>
+            </tr>
 
         </table>
     {% endif %}
