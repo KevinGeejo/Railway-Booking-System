@@ -7,6 +7,8 @@ from django.template import loader
 
 from django.db import connection
 from django.shortcuts import render, redirect
+
+import rail.models
 from .models import Users, Stations, Trainitems
 
 '''
@@ -32,7 +34,66 @@ def index(request):
 
 
 '''
-需求4: 查询
+订单界面
+'''
+
+
+def BookingTicket(request):
+    user_name = request.session.get('user_name', default='')
+    user_id = request.session.get('user_id', default='')
+    user_stat = request.session.get('user_stat', default=False)
+    error_msg = ''
+    tid = request.session.get('tid', '')
+    starter = request.session.get('starter', '')
+    date = request.session.get('departure_date', '')
+    # TODO
+    seattype = request.session.get('seattype', 'hse')
+
+    if request.method == 'POST':
+        terminal = request.POST.get('terminal')
+
+        if (not tid or not starter or not terminal
+                or not date
+                # or not seattype
+        ):
+            error_msg = '抱歉, 缺少信息, 请您检查后重新提交'
+            return render(request,
+                          'rail/BookingTicket.html',
+                          locals())
+
+        departuretime = rail.models.Trainitems.objects.filter(
+            ti_tid=tid, ti_arrivalstation=starter
+        )[0].ti_departuretime
+
+        oid = str(int(
+            rail.models.Orders.objects.all().order_by(
+                '-o_oid')[0].o_oid) + 1).zfill(15)
+
+        new_order = rail.models.Orders()
+
+        new_order.o_oid = oid
+        new_order.o_idnumber = str(user_id)
+        new_order.o_tid = tid
+        new_order.o_departuredate = date
+        new_order.o_departuretime = departuretime
+        new_order.o_seattype = seattype
+        new_order.o_orderstatus = 'valid'
+        new_order.o_departurestation = starter
+        new_order.o_arrivalstation = terminal
+
+        new_order.save()
+        error_msg = '订票成功!'
+        return render(request,
+                      'rail/BookingTicket.html',
+                      locals())
+    return render(request,
+                  'rail/BookingTicket.html',
+                  locals())
+
+
+'''
+TODO: 
+需求4: 车次信息查询
 '''
 
 
@@ -47,15 +108,15 @@ def AskTid(request):
 
     try:
         input_tid = request.GET.get('tid')
+        departure_date = request.GET.get('departure_date')
+        request.session['departure_date'] = departure_date
     except:
         return render(request,
                       'rail/AskTid.html',
-                      {
-                          'error_msg': '',
-                          'user_name': user_name,
-                          'user_id': user_id,
-                          'user_stat': user_stat,
-                      })
+                      locals(),
+                      )
+
+    request.session['tid'] = str(input_tid)
 
     if not input_tid:
         if not new_question:
@@ -67,21 +128,15 @@ def AskTid(request):
                 ti_tid=input_tid
             ).order_by('ti_seq'))
         starter = tid_info[0]
-        terminal = tid_info[len(tid_info) - 1]
-        mids = tid_info[1:len(tid_info) - 2]
+        request.session['starter'] = str(starter.ti_arrivalstation)
+        terminal = tid_info[-1]
+        request.session['terminal'] = str(terminal.ti_arrivalstation)
+        mids = tid_info[1:-2]
 
     return render(request,
                   'rail/AskTid.html',
-                  {
-                      'error_msg': error_msg,
-                      'ask_tid': input_tid,
-                      'starter': starter,
-                      'terminal': terminal,
-                      'tid_info': mids,
-                      'user_name': user_name,
-                      'user_id': user_id,
-                      'user_stat': user_stat,
-                  })
+                  locals(),
+                  )
 
 
 '''

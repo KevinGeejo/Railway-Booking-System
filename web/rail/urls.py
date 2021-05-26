@@ -20,6 +20,10 @@ urlpatterns = [
             views.AskTid,
             name="AskTid"),
 
+    re_path(r'^BookingTicket/',
+            views.BookingTicket,
+            name="BookingTicket"),
+
     # # 例如: /polls/
     # path('', views.index, name='index'),
     #
