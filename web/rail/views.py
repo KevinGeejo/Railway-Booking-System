@@ -69,19 +69,37 @@ def BookingTicket(request):
             rail.models.Orders.objects.all().order_by(
                 '-o_oid')[0].o_oid) + 1).zfill(15)
 
-        new_order = rail.models.Orders()
+        with connection.cursor() as c:
+            c.execute(
+                '''
+                insert into orders values(
+                %s,%s,%s, %s,%s,%s,%s,%s,%s);
+                ''',
+                [
+                    oid,
+                    user_id,
+                    tid,
+                    date,
+                    departuretime,
+                    seattype,
+                    'valid',
+                    starter,
+                    terminal
+                ]
+            )
+        # new_order = rail.models.Orders()
+        #
+        # new_order.o_oid = oid
+        # new_order.o_idnumber = str(user_id)
+        # new_order.o_tid = tid
+        # new_order.o_departuredate = date
+        # new_order.o_departuretime = departuretime
+        # new_order.o_seattype = seattype
+        # new_order.o_orderstatus = 'valid'
+        # new_order.o_departurestation = starter
+        # new_order.o_arrivalstation = terminal
 
-        new_order.o_oid = oid
-        new_order.o_idnumber = str(user_id)
-        new_order.o_tid = tid
-        new_order.o_departuredate = date
-        new_order.o_departuretime = departuretime
-        new_order.o_seattype = seattype
-        new_order.o_orderstatus = 'valid'
-        new_order.o_departurestation = starter
-        new_order.o_arrivalstation = terminal
-
-        new_order.save()
+        # new_order.save()
         error_msg = '订票成功!'
         return render(request,
                       'rail/BookingTicket.html',
