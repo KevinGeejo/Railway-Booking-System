@@ -59,7 +59,7 @@ def BookingTicket(request):
         request.session['terminal'] = terminal
         if not seattype:
             seattype = request.POST.get('seattype')
-        request.session['seattype'] = seattype
+        # request.session['seattype'] = seattype
 
         if (
                 not tid
@@ -73,49 +73,75 @@ def BookingTicket(request):
                           'rail/BookingTicket.html',
                           locals())
 
-        departuretime = rail.models.Trainitems.objects.filter(
-            ti_tid=tid, ti_arrivalstation=starter
-        )[0].ti_departuretime
+        new_ti = rail.models.Trainitems.objects.filter(
+            ti_tid=tid, ti_arrivalstation=starter)[0]
+        departuretime = new_ti.ti_departuretime
 
         oid = str(int(
             rail.models.Orders.objects.all().order_by(
                 '-o_oid')[0].o_oid) + 1).zfill(15)
 
-        with connection.cursor() as c:
-            c.execute(
-                '''
-                insert into orders values(
-                %s,%s,%s,%s,%s,%s,%s,%s,%s);
-                ''',
-                [
-                    oid,
-                    user_id,
-                    tid,
-                    date,
-                    departuretime,
-                    seattype,
-                    'valid',
-                    starter,
-                    terminal
-                ]
-            )
-        # new_order = rail.models.Orders()
-        #
-        # new_order.o_oid = oid
-        # new_order.o_idnumber = str(user_id)
-        # new_order.o_tid = tid
-        # new_order.o_departuredate = date
-        # new_order.o_departuretime = departuretime
-        # new_order.o_seattype = seattype
-        # new_order.o_orderstatus = 'valid'
-        # new_order.o_departurestation = starter
-        # new_order.o_arrivalstation = terminal
+        # TODO: check 是否有余票
+        flag_order = 0
+        try:
+            with connection.cursor() as c:
+                for seattype in ['ssl', 'ssu', 'hsl',
+                                 'hsm', 'hsu', 'sse', 'hse']:
+                    c.execute('select remaining_ticket(%s, %s, %s);',
+                              [tid,
+                               date,
+                               seattype])
+                remainingsRaw = c.fetchall()
+            q = []
+            for r in remainingsRaw:
+                q.append(r[0].lstrip('(').rstrip(')'))
+            q1 = []
+            for r in q:
+                q1.append(r.split(','))
+            q1.sort(key=takeSeq)
+            remList = [[int(s[0]), int(s[2])] for s in q1]
+            for rem in remList:
+                if rem[0] == new_ti.ti_seq:
+                    if rem[1] > 0:
+                        flag_order = 1
 
-        # new_order.save()
-        error_msg = '订票成功!'
-        return render(request,
-                      'rail/BookingTicket.html',
-                      locals())
+        except:
+            pass
+
+        if flag_order:
+            try:
+                with connection.cursor() as c:
+                    c.execute(
+                        '''
+                        insert into orders values(
+                        %s,%s,%s,%s,%s,%s,%s,%s,%s);
+                        ''',
+                        [
+                            oid,
+                            user_id,
+                            tid,
+                            date,
+                            departuretime,
+                            seattype,
+                            'valid',
+                            starter,
+                            terminal
+                        ]
+                    )
+                error_msg = '订票成功!'
+                return render(request,
+                              'rail/BookingTicket.html',
+                              locals())
+            except:
+                error_msg = '订票失败!'
+                return render(request,
+                              'rail/BookingTicket.html',
+                              locals())
+        else:
+            error_msg = '订票失败! 似乎没有票了!'
+            return render(request,
+                          'rail/BookingTicket.html',
+                          locals())
     return render(request,
                   'rail/BookingTicket.html',
                   locals())
@@ -125,6 +151,10 @@ def BookingTicket(request):
 TODO: 
 需求4: 车次信息查询
 '''
+
+
+def takeSeq(elem):
+    return int(elem[0])
 
 
 def AskTid(request):
@@ -175,6 +205,31 @@ def AskTid(request):
 
         try:
             mids = tid_info[1:-2]
+        except:
+            pass
+
+        try:
+            with connection.cursor() as c:
+                for seattype in ['ssl', 'ssu', 'hsl',
+                                 'hsm', 'hsu', 'sse', 'hse']:
+                    c.execute('select remaining_ticket(%s, %s, %s);',
+                              [input_tid,
+                               departure_date,
+                               seattype])
+                remainingsRaw = c.fetchall()
+            q = []
+            for r in remainingsRaw:
+                q.append(r[0].lstrip('(').rstrip(')'))
+
+            q1 = []
+            for r in q:
+                q1.append(r.split(','))
+
+            q1.sort(key=takeSeq)
+
+            remList = [[int(s[0]), int(s[2])] for s in q1]
+            lastList = remList[-1]
+
         except:
             pass
 
