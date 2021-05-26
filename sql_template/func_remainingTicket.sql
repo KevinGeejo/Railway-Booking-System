@@ -88,7 +88,7 @@ where
     and o_departurestation = seq.ti_arrivalstation
     and o_tid = trainitem.ti_tid
     and trainitem.ti_tid = tid
-    and o_departuredate = order_date
+    and is_date_consist(o_departuredate, order_date, o_tid, o_departurestation)
     and o_seattype = seat_type
     and o_orderstatus != 'cancelled'
     and seq.ti_seq < trainitem.ti_seq
@@ -129,7 +129,7 @@ where
                                 o_tid = seq.ti_tid
                                 and o_departurestation = seq.ti_arrivalstation
                                 and o_tid = tid
-                                and o_departuredate = order_date
+                                and is_date_consist(o_departuredate, order_date, o_tid, o_departurestation)
                                 and o_seattype = seat_type
                                 and o_orderstatus != 'cancelled'
                             )
@@ -158,7 +158,7 @@ where
                         select o_tid
                         from orders
                         where o_seattype = seat_type
-                              and o_departuredate = order_date
+                              and is_date_consist(o_departuredate, order_date, o_tid, o_departurestation)
                         )
 group by trainitem.ti_seq,trainitem.ti_arrivalstation
 order by trainitem.ti_seq,trainitem.ti_arrivalstation);
