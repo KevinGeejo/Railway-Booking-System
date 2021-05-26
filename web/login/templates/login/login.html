@@ -10,7 +10,9 @@
 
 {% block content %}
     {% if message %}
-        <div class="alert alert-warning">{{ message }}</div>
+        <div class="alert alert-warning">
+            {{ message }}
+        </div>
     {% endif %}
     <form class="form-login" action="/login/" method="post">
         {% csrf_token %}
@@ -22,6 +24,7 @@
                    placeholder="Username"
                    autofocus required>
         </div>
+
         <div>
             <button type="submit" class="btn btn-primary float-right">登录</button>
         </div>

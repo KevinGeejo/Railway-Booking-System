@@ -8,9 +8,17 @@
 
         {% endblock %}
     </title>
+    {% block css %}
+    {% endblock %}
 </head>
 
 <body>
+<div id="header">
+    {% block header_in_body %}
+
+    {% endblock %}
+</div>
+
 <div id="sidebar">
     {% block sidebar %}
         <ul>

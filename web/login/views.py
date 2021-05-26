@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from rail import models
+import rail.models
+from . import forms
 
 
 # Create your views here.
@@ -19,8 +20,9 @@ def login(request):
         username = request.POST.get('username')
         if username.strip():  # 确保用户名不为空
             try:
-                user = models.Users.objects.get(u_username=username)
-            except models.Users.DoesNotExist:
+                user = rail.models.Users.objects.get(
+                    u_username=username)
+            except rail.models.Users.DoesNotExist:
                 message = '用户 ' + username + ' 未注册!'
                 return render(request,
                               'login/login.html',
@@ -36,6 +38,47 @@ def login(request):
 
 def register(request):
     # TODO: 注册, 插入用户
+    if request.session.get('is_login', None):
+        return redirect('/index/')
+    if request.method == 'POST':
+        username = request.POST.get('u_username')
+        name = request.POST.get('u_name')
+        creditcard = request.POST.get('u_creditcard')
+        phone = request.POST.get('u_phone')
+        idnumber = request.POST.get('u_idnumber')
+        message = '请检查您填写的内容是否符合要求!'
+        print("no id" if not idnumber else idnumber)
+
+        # 检验重复
+        same_username_user = rail.models.Users.objects.filter(
+            u_username=username)
+        if same_username_user:
+            message = '用户名已存在, 请尝试使用其他用户名'
+            return render(request, 'login/register.html',
+                          locals())
+
+        same_phone_user = rail.models.Users.objects.filter(
+            u_phone=phone)
+        if same_phone_user:
+            message = '电话号码已被其他用户注册, 请更换电话号码'
+            return render(request, 'login/register.html',
+                          locals())
+
+        same_idnumber_user = rail.models.Users.objects.filter(
+            u_idnumber=idnumber)
+        if same_idnumber_user:
+            message = '身份证已被其他用户注册, 请检查您的身份证信息'
+            return render(request, 'login/register.html',
+                          locals())
+
+        new_user = rail.models.Users()
+        new_user.u_name = name
+        new_user.u_username = username
+        new_user.u_phone = phone
+        new_user.u_idnumber = idnumber
+        new_user.u_creditcard = creditcard
+        new_user.save()
+
     return render(request, 'login/register.html')
 
 

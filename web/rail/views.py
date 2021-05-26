@@ -16,18 +16,29 @@ def index(request):
     # return render(request, 'rail/welcome.html')
     user_name = request.session.get('user_name', default='')
     user_id = request.session.get('user_id', default='')
+    user_stat = request.session.get('is_login', default=False)
     return render(request,
                   'rail/welcome.html',
                   {'user_name': user_name,
-                   'user_id': user_id})
+                   'user_id': user_id,
+                   'user_stat': user_stat})
 
 
 def findStationsInCity(request):
-    pass
-    return render(request, 'rail/findStationsInCity.html')
+    user_name = request.session.get('user_name', default='')
+    user_id = request.session.get('user_id', default='')
+    user_stat = request.session.get('is_login', default=False)
+    return render(request,
+                  'rail/findStationsInCity.html',
+                  {'user_name': user_name,
+                   'user_id': user_id,
+                   'user_stat': user_stat})
 
 
 def findStationsInCityAnswer(request):
+    user_name = request.session.get('user_name', default='')
+    user_id = request.session.get('user_id', default='')
+    user_stat = request.session.get('is_login', default=False)
     input_city = request.GET.get('stations')
     error_msg = ''
 
@@ -35,7 +46,10 @@ def findStationsInCityAnswer(request):
         error_msg = '查询不成功!'
         return render(request,
                       'rail/errors.html',
-                      {'error_msg': error_msg
+                      {'error_msg': error_msg,
+                       'user_name': user_name,
+                       'user_id': user_id,
+                       'user_stat': user_stat
                        })
 
     # ORM method
@@ -65,7 +79,10 @@ def findStationsInCityAnswer(request):
                   {
                       'error_msg': error_msg,
                       'ask_city': input_city,
-                      'station_list': station_list
+                      'station_list': station_list,
+                      'user_name': user_name,
+                      'user_id': user_id,
+                      'user_stat': user_stat
                   })
 
 

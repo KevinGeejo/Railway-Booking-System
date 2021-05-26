@@ -1,0 +1,92 @@
+{% extends 'base_LOGIN.html' %}
+
+{% block title %}
+    用户注册
+{% endblock %}
+
+{% block h1-title %}
+    用户注册
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="col">
+            <form class="form-register"
+                  action="/register/"
+                  method="post">
+
+                {% if message %}
+                    <div class="alert alert-warning">
+                        {{ message }}
+                    </div>
+                {% endif %}
+                {% csrf_token %}
+                <h3>欢迎注册</h3>
+                <div class="form-group">
+                    <label for="u_username">用户名</label>
+                    <input type="text" class="form-control"
+                           id="u_username" name="u_username"
+                           required>
+{#                    {{ register_form.u_username.label_tag }}#}
+{#                      {{ register_form.u_username}}#}
+                </div>
+                <div class="form-group">
+                    <label for="u_identitycard">身份证</label>
+                    <input type="text" class="form-control"
+                           id="u_identitycard" name="u_identitycard"
+                           required>
+                </div>
+                <div class="form-group">
+                    <label for="u_phone">电话号码</label>
+                    <input type="text" class="form-control"
+                           id="u_phone" name="u_phone"
+                           required>
+                </div>
+                <div class="form-group">
+                    <label for="u_name">真实姓名</label>
+                    <input type="text" class="form-control"
+                           id="u_name" name="u_name"
+                           required>
+                </div>
+                <div class="form-group">
+                    <label for="u_creditcard">信用卡号</label>
+                    <input type="text" class="form-control"
+                           id="u_creditcard" name="u_creditcard"
+                           required>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-primary float-right">
+                        注册
+                    </button>
+                    <br>
+                    或 <a href="/login/">
+                    <ins>直接登录</ins>
+                </a>
+                </div>
+            </form>
+        </div>
+    </div> <!-- /container -->
+{% endblock %}
+
+<form style="text-align:center">
+    <label for="u_name">&nbsp;&nbsp;&nbsp;姓名:</label>
+    <input type="text" name="name" id="u_name">
+    <br/>
+    <label for="u_identitycard">身份证:</label>
+    <input type="text" name="identitycard" id="u_identitycard">
+    <br/>
+    <label for="u_phone">手机号:</label>
+    <input type="text" name="phone" id="u_phone">
+    <br/>
+    <label for="u_creditcard">信用卡: </label>
+    <input type="text" name="creditcard" id="u_creditcard">
+    <br/>
+    <label for="u_username">用户名: </label>
+    <input type="text" name="username" id="u_username">
+    <br/>
+    <br/>
+    <a href="login.html">点此注册</a>
+</form>
+
+
+
