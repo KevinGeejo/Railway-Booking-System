@@ -6,20 +6,19 @@
 # @Software: PyCharm
 
 from django.urls import path, re_path
-
 from . import views
 
 urlpatterns = [
     # 例如: /polls/
     path('', views.index, name='index'),
 
-    # test
-    # path('', views.query_for_stations_in_city_test, name='query_for_stations_in_city_test'),
-
-
     re_path(r'^findStationsInCity/',
-         views.findStationsInCity,
-         name="findStationInCity"),
+            views.findStationsInCity,
+            name="findStationInCity"),
+
+    re_path(r'^AskTid/',
+            views.AskTid,
+            name="AskTid"),
 
     # # 例如: /polls/
     # path('', views.index, name='index'),

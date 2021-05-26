@@ -11,34 +11,34 @@
     {% if error_msg %}
         <p>{{ error_msg }}</p>
     {% endif %}
+
     <form method="get" action="findStationsInCity/">
         {% csrf_token %}
-        <label for="stations">
+        <label for="city">
             <input type="search"
-                   name="stations"
-                   id="stations"
+                   name="city"
+                   id="city"
                    placeholder="在这里输入城市名"
                    required>
         </label>
         <button type="submit">查询</button>
     </form>
-
 {% endblock %}
 
 {% block answer %}
-    {% if station_list %}
-        查到以下车站位于{{ ask_city }}:
-        <br>
-        {% for station in station_list %}
-            <ul>
-                <li>
-                    {{ station }}
-                </li>
-            </ul>
-        {% empty %}
-            <div class="no-station">
-                抱歉, 没有搜索到符合条件的车站.
-            </div>
-        {% endfor %}
-    {% endif %}
+{% if station_list %}
+查到以下车站位于{{ ask_city }}:
+<br>
+{% for station in station_list %}
+    <ul>
+        <li>
+            {{ station }}
+        </li>
+    </ul>
+{% empty %}
+    <div class="no-station">
+        抱歉, 没有搜索到符合条件的车站.
+    </div>
+{% endfor %}
+{% endif %}
 {% endblock %}

@@ -138,23 +138,21 @@ class Trainitems(models.Model):
     ti_tid = models.CharField(primary_key=True, max_length=5)
     ti_seq = models.IntegerField()
     ti_arrivalstation = models.ForeignKey(Stations, models.DO_NOTHING, db_column='ti_arrivalstation')
-    ti_arrivaltime = models.TimeField(blank=True)
-    ti_departuretime = models.TimeField(blank=True)
-    ti_hseprice = models.FloatField(blank=True)
-    ti_sseprice = models.FloatField(blank=True)
-    ti_hsuprice = models.FloatField(blank=True)
-    ti_hsmprice = models.FloatField(blank=True)
-    ti_hslprice = models.FloatField(blank=True)
-    ti_ssuprice = models.FloatField(blank=True)
-    ti_sslprice = models.FloatField(blank=True)
+    ti_arrivaltime = models.TimeField(blank=True, null=True)
+    ti_departuretime = models.TimeField(blank=True, null=True)
+    ti_hseprice = models.FloatField(blank=True, null=True)
+    ti_sseprice = models.FloatField(blank=True, null=True)
+    ti_hsuprice = models.FloatField(blank=True, null=True)
+    ti_hsmprice = models.FloatField(blank=True, null=True)
+    ti_hslprice = models.FloatField(blank=True, null=True)
+    ti_ssuprice = models.FloatField(blank=True, null=True)
+    ti_sslprice = models.FloatField(blank=True, null=True)
+    ti_offsetday = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'trainitems'
         unique_together = (('ti_tid', 'ti_arrivalstation'),)
-
-    def __str__(self):
-        return self.ti_tid
 
 
 class Users(models.Model):

@@ -1,0 +1,125 @@
+{% extends 'base_RAIL.html' %}
+
+<!--查询具体车次-->
+{% block title %}
+    车次信息查询
+{% endblock %}
+
+{% block h1-title %}
+    车次信息查询
+{% endblock %}
+
+
+{% block content %}
+    {% if error_msg %}
+        <p>{{ error_msg }}</p>
+    {% endif %}
+
+    <form method="get" action="AskTid/">
+        {% csrf_token %}
+        <label for="tid">
+            车次
+        </label>
+        <input type="text" name="tid" id="tid">
+        <br> <br>
+        <label for="departure_date">
+            出发日期
+        </label>
+        <input type="date" name="departure_date" id="departure_date">
+        <br> <br>
+        <input type="submit" value="查询">
+    </form>
+    <br>
+{% endblock %}
+
+{% block answer %}
+    <br>
+    {# 静态信息 #}
+    {% if tid_info %}
+        {{ ask_tid }} 次列车的信息:
+        <br>
+        <table style="border-bottom-width: thin">
+            <tr>
+                {# 表头 #}
+                <td>站名</td>
+                <td>到站时间</td>
+                <td>离站时间</td>
+                <td>软卧(上铺) / 元</td>
+                <td>软卧(下铺) / 元</td>
+                <td>硬卧(下铺) / 元</td>
+                <td>硬卧(中铺) / 元</td>
+                <td>硬卧(上铺) / 元</td>
+                <td>软座 / 元</td>
+                <td>硬座 / 元</td>
+            </tr>
+
+            {# 始发站 #}
+            <tr>
+                <td>{{ starter.ti_arrivalstation }}</td>
+                <td>-</td>
+                <td>
+                    {{ starter.ti_departuretime }}
+                </td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+            </tr>
+
+            {# 中间站 #}
+            {% for item in tid_info %}
+                <tr>
+                    <td>{{ item.ti_arrivalstation }}</td>
+                    <td>
+                        {{ item.ti_arrivaltime }}
+                    </td>
+                    <td>
+                        {{ item.ti_departuretime }}
+                        {% if item.ti_offsetday %}
+                            (+{{ item.ti_offsetday }})
+                        {% endif %}
+                    </td>
+                    <td>{{ item.ti_sslprice }}</td>
+                    <td>{{ item.ti_ssuprice }}</td>
+                    <td>{{ item.ti_hslprice }}</td>
+                    <td>{{ item.ti_hsmprice }}</td>
+                    <td>{{ item.ti_hsuprice }}</td>
+                    <td>{{ item.ti_sseprice }}</td>
+                    <td>{{ item.ti_hseprice }}</td>
+                </tr>
+            {% empty %}
+                <div class="no-station">
+                    抱歉, 没有搜索到符合条件的车站.
+                </div>
+            {% endfor %}
+
+            {# 终到站 #}
+            <tr>
+                    <td>{{ terminal.ti_arrivalstation }}</td>
+                    <td>
+                        {{ terminal.ti_arrivaltime }}
+                        {% if terminal.ti_offsetday %}
+                            (+{{ terminal.ti_offsetday }})
+                        {% endif %}
+                    </td>
+                    <td>-</td>
+                    <td>{{ terminal.ti_sslprice }}</td>
+                    <td>{{ terminal.ti_ssuprice }}</td>
+                    <td>{{ terminal.ti_hslprice }}</td>
+                    <td>{{ terminal.ti_hsmprice }}</td>
+                    <td>{{ terminal.ti_hsuprice }}</td>
+                    <td>{{ terminal.ti_sseprice }}</td>
+                    <td>{{ terminal.ti_hseprice }}</td>
+                </tr>
+
+        </table>
+    {% endif %}
+
+    {# 动态信息 #}
+    {# TODO #}
+{% endblock %}
+
+
