@@ -14,25 +14,33 @@
         <label for="tid">
             车次
         </label>
-        <input type="text" name="tid" id="tid" value={{ tid }}>
+        <input type="text" name="tid" id="tid"
+               required
+               value={{ tid }} >
         <br> <br>
 
         <label for="start_station">
             出发车站
         </label>
-        <input type="text" name="start_station" id="start_station" value={{ starter }}>
+        <input type="text" name="start_station" id="start_station"
+               required
+               value={{ starter }}>
         <br> <br>
 
         <label for="terminal_station">
             到达车站
         </label>
-        <input type="text" name="terminal_station" id="terminal_station" value={{ terminal }}>
+        <input type="text" name="terminal_station" id="terminal_station"
+               required
+               value={{ terminal }} >
         <br> <br>
 
         <label for="date">
             出发日期
         </label>
-        <input type="date" name="date" id="date" value={{ date }}>
+        <input type="date" name="date" id="date"
+               required
+               value={{ date }} >
         <br> <br>
 
         <label for="seattype">
@@ -46,13 +54,13 @@
         <input type="radio" name="seattype" id="seattype" value="sse">软座
         <input type="radio" name="seattype" id="seattype" value="hse">硬座
         <br><br>
-        <input type="submit" value="购票" >
+        <input type="submit" value="购票">
     </form>
     <br>
 {% endblock %}
 
 {% block answer %}
-     {% if error_msg %}
+    {% if error_msg %}
         <p>{{ error_msg }}</p>
     {% endif %}
 {% endblock %}

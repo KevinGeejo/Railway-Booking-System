@@ -38,7 +38,7 @@ def index(request):
 
 
 '''
-需求6: 翻转双城
+需求6: 翻转需求 5 的双城
 '''
 
 
@@ -50,7 +50,7 @@ def reverseBooking(requset):
 
 
 '''
-订单界面
+通用工具人: 订单界面
 '''
 
 
@@ -161,12 +161,12 @@ def BookingTicket(request):
                             terminal
                         ]
                     )
-                error_msg = '订票成功!'
+                error_msg = '订票成功! 请管理员喝一杯靓靓的 beer'
                 return render(request,
                               'rail/BookingTicket.html',
                               locals())
             except:
-                error_msg = '订票失败!'
+                error_msg = '订票失败! 数据库正在饮茶, 请立刻通知管理员'
                 return render(request,
                               'rail/BookingTicket.html',
                               locals())
@@ -175,19 +175,54 @@ def BookingTicket(request):
             return render(request,
                           'rail/BookingTicket.html',
                           locals())
+    error_msg = '订票失败! 请尝试再次订票'
     return render(request,
                   'rail/BookingTicket.html',
                   locals())
 
 
 '''
-TODO: 
-需求4: 车次信息查询
+需求 4 引入的工具人 * 2
 '''
 
 
 def takeSeq(elem):
     return int(elem[0])
+
+
+def AskTidSeeRemain(rt_list):
+    temp_list = []
+    for rt_item in rt_list:
+        q = []
+        for r_item in rt_item:
+            # res: ['13,北京南,0', ...]
+            q.append(r_item[0].lstrip('(').rstrip(')'))
+
+        q1 = []
+        for r in q:
+            # res: [['13','北京南','0'], ...]
+            q1.append(r.split(','))
+
+        # res: [['1','xxx','num'], ...]
+        q1.sort(key=takeSeq)
+
+        # res: [[1, num], ...]
+        remList = [[int(s[0]), int(s[2])] for s in q1]
+        temp_list.append(remList)
+
+    ret_list = temp_list[0]
+    for ret in ret_list:
+        ret[1] = 0
+
+    for i in range(1, len(ret_list), 1):
+        ret_list[i][1] = sum([a[i][1] for a in temp_list])
+
+    return ret_list
+
+
+'''
+(已验证) 需求4: 车次信息查询
+'''
 
 
 def AskTid(request):
@@ -208,6 +243,7 @@ def AskTid(request):
         departure_date = request.GET.get('departure_date')
         request.session['departure_date'] = departure_date
     except:
+        error_msg = '抱歉, 查询输入获取失败, 请重试'
         return render(request,
                       'rail/AskTid.html',
                       locals(),
@@ -217,31 +253,31 @@ def AskTid(request):
 
     if not input_tid:
         if not new_question:
-            error_msg = '抱歉, 查询输入不成功, 请重试'
+            error_msg = '抱歉, 查询输入获取失败, 请重试'
+
     else:
         # ORM method
         tid_info = list(
             Trainitems.objects.filter(
                 ti_tid=input_tid
             ).order_by('ti_seq'))
-        try:
-            starter = tid_info[0]
-            request.session['starter'] = str(starter.ti_arrivalstation)
-        except:
-            pass
+
+        if not tid_info:
+            error_msg = '抱歉, 查询输入获取结果为空, 请重试'
+            return render(request,
+                          'rail/AskTid.html',
+                          locals(),
+                          )
+
+        starter = tid_info[0]
+        request.session['starter'] = str(starter.ti_arrivalstation)
+
+        terminal = tid_info[-1]
+        request.session['terminal'] = str(terminal.ti_arrivalstation)
+        mids = tid_info[1:-2]
 
         try:
-            terminal = tid_info[-1]
-            request.session['terminal'] = str(terminal.ti_arrivalstation)
-        except:
-            pass
-
-        try:
-            mids = tid_info[1:-2]
-        except:
-            pass
-
-        try:
+            f = []
             with connection.cursor() as c:
                 for seattype in ['ssl', 'ssu', 'hsl',
                                  'hsm', 'hsu', 'sse', 'hse']:
@@ -249,19 +285,11 @@ def AskTid(request):
                               [input_tid,
                                departure_date,
                                seattype])
-                remainingsRaw = c.fetchall()
-            q = []
-            for r in remainingsRaw:
-                q.append(r[0].lstrip('(').rstrip(')'))
+                    f.append(c.fetchall())
 
-            q1 = []
-            for r in q:
-                q1.append(r.split(','))
-
-            q1.sort(key=takeSeq)
-
-            remList = [[int(s[0]), int(s[2])] for s in q1]
+            remList = AskTidSeeRemain(f)
             lastList = remList[-1]
+            # print(lastList)
 
         except:
             pass
