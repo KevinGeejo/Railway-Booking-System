@@ -6,11 +6,13 @@ from django.http import HttpResponse
 from django.template import loader
 
 from django.db import connection
+from django.shortcuts import render, redirect
 from .models import Stations
 
 
 def index(request):
-    pass
+    if not request.session.get('is_login', None):
+        return redirect("/login/")
     # return render(request, 'rail/welcome.html')
     user_name = request.session.get('user_name', default='')
     user_id = request.session.get('user_id', default='')

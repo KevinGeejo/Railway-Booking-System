@@ -5,7 +5,8 @@ from rail import models
 # Create your views here.
 
 def index(request):
-    pass
+    if not request.session.get('is_login', None):
+        return redirect("/login/")
     return redirect("/rail/")
 
 
@@ -29,19 +30,6 @@ def login(request):
             request.session['user_name'] = user.u_name
             request.session['user_id'] = user.u_idnumber
             return redirect('/rail/')
-
-            # tiny demo
-            # if models.Users.objects.filter(u_username=username).exists():
-            #     user = models.Users.objects.get(u_username=username)
-            #     request.session['is_login'] = True
-            #     request.session['user_name'] = user.u_name
-            #     request.session['user_id'] = user.u_idnumber
-            #     return redirect('/rail/')
-            # else:
-            #     message = '用户 ' + username + ' 未注册!'
-            #     return render(request,
-            #                   'login/login.html',
-            #                   {'message': message})
 
     return render(request, 'login/login.html')
 
