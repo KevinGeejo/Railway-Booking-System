@@ -24,6 +24,14 @@ urlpatterns = [
             views.BookingTicket,
             name="BookingTicket"),
 
+    re_path(r'^ShowMyOrders/',
+            views.ShowMyOrders,
+            name="ShowMyOrders"),
+
+    re_path(r'^AdminPage/',
+            views.AdminPage,
+            name="AdminPage")
+
     # # 例如: /polls/
     # path('', views.index, name='index'),
     #

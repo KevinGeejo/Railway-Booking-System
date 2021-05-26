@@ -39,6 +39,85 @@ def index(request):
 
 
 '''
+需求 9: 管理员
+'''
+
+
+def findNum(elem):
+    return elem[1]
+
+
+def AdminPage(request):
+    # TODO: 管理员
+    # 1. 总订单数
+    order_number = rail.models.Orders.objects.count()
+    # 2. 总金额
+
+    # 3. 热点车次 Top 10
+    hot_list = list(rail.models.Orders.objects.all().values('o_tid'))
+    tidList = []
+    for hot in hot_list:
+        tidList.append(hot['o_tid'])
+    hots = []
+    for item in list(set(tidList)):
+        hots.append([item, tidList.count(item)])
+    hots.sort(key=findNum, reverse=True)
+    if len(hots) > 10:
+        true_hot = hots[0:9]
+    else:
+        true_hot = hots
+    # 4. 注册用户列表
+    userList = list(rail.models.Users.objects.all())
+    # 5. 所有用户的订单
+
+    # 结束
+    return render(request,
+                  'rail/AdminPage.html',
+                  locals())
+
+
+'''
+需求 8: 管理订单
+'''
+
+
+def ShowMyOrders(request):
+    user_name = request.session.get('user_name', default='')
+    user_id = request.session.get('user_id', default='')
+    user_stat = request.session.get('user_stat', default=False)
+
+    # TODO: recv date, see as looking for 'after date'
+    date = request.POST.get('date', '')
+    if not date:
+        date = request.session['date']
+    else:
+        request.session['date'] = date
+
+    # order_list: 订单号，日期、出发到达站、订单状态（是否已经取消）
+    orderList = list(rail.models.Orders.objects.filter(
+        o_idnumber=user_id, o_departuredate__gte=date))
+    if not orderList:
+        have_order = 0
+    else:
+        have_order = 1
+
+    # 总票价
+    costList = []
+    for order in orderList:
+        order_begin = order.o_departurestation
+        order_end = order.o_arrivalstation
+        order_tid = order.o_tid
+        order_seat = order.o_seattype
+        # TODO: 算价格
+        # rail.models.Trainitems.objects.filter(ti_arrivalstation=order_end, ti_sorder_seat)
+
+    return render(request,
+                  'rail/ShowMyOrders.html',
+                  locals())
+
+
+'''
+还没做完
 需求6: 翻转需求 5 的双城
 '''
 

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% if admin_stat %}
+    {% block title %}
+        订票系统-后台管理
+    {% endblock %}
+
+    {% block h1-title %}
+        欢迎您, 管理员.
+    {% endblock %}
+
+
+    {% block content %}
+        <h2>总订单数</h2>
+        目前有 {{ order_number }} 份订单.
+        <h2>总票价</h2>
+        {# TODO #}
+        <h2>热点车次 Top 10</h2>
+        <ol>
+        {% for h in true_hot %}
+            <li>{{ h.0 }} 次</li>
+        {% endfor %}
+        </ol>
+        <h2>注册用户列表</h2>
+        <p style="font-weight: lighter">
+        <table style="border-width: medium;
+                       border-style: solid;"
+               border="1">
+            <tr>
+                <th>用户名</th>
+                <th>真实姓名</th>
+                <th>身份证号</th>
+                <th>信用卡号</th>
+                <th>手机号码</th>
+            </tr>
+            {% for user in userList %}
+                <tr>
+                    <th>{{ user.u_username }}</th>
+                    <th>{{ user.u_name }}</th>
+                    <th>{{ user.u_idnumber }}</th>
+                    <th>{{ user.u_creditcard }}</th>
+                    <th>{{ user.u_phone }}</th>
+                </tr>
+            {% endfor %}
+        </table>
+        </p>
+
+        <h2>所有用户的订单</h2>
+    {% endblock %}
+{% endif %}
+
+{% block footer %}
+    <a href="/logout/">登出</a>
+{% endblock %}

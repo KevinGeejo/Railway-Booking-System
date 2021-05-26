@@ -1,0 +1,33 @@
+{% extends 'base_RAIL.html' %}
+{% load get_dates %}
+
+{% block title %}
+    {{ user }}的订单
+{% endblock %}
+
+{% block h1-title %}
+    {{ user }} 的订单
+{% endblock %}
+
+{% block content %}
+    <form method="get" action="/rail/ShowMyOrders/">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="date">
+                查看不早于
+                <input type="date" name="date"
+                   id="date"
+                   required
+                   value={% if date %}{{ date }}{% else %}{{ tomorrow }}{% endif %}>
+                出发的订单:
+            </label>
+        </div>
+        <br>
+        <input type="submit" value="查询">
+    </form>
+    <br>
+{% endblock %}
+
+{% block answer %}
+
+{% endblock %}
