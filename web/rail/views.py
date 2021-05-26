@@ -38,6 +38,18 @@ def index(request):
 
 
 '''
+需求6: 翻转双城
+'''
+
+
+def reverseBooking(requset):
+    new_date = requset.session.get('date', '')
+    new_starter = requset.session.get('terminal', '')
+    new_terminal = requset.session.get('starter', '')
+    # AskingTwo(requset)
+
+
+'''
 订单界面
 '''
 
@@ -47,19 +59,37 @@ def BookingTicket(request):
     user_id = request.session.get('user_id', default='')
     user_stat = request.session.get('user_stat', default=False)
     error_msg = ''
-    tid = request.session.get('tid', '')
-    starter = request.session.get('starter', '')
-    date = request.session.get('departure_date', '')
-    seattype = request.session.get('seattype', '')
-    terminal = request.session['terminal']
 
     if request.method == 'POST':
+        tid = request.POST.get('tid')
+        if not tid:
+            tid = request.session.get('tid', '')
+        else:
+            request.session['tid'] = tid
+
+        terminal = request.POST.get('terminal')
         if not terminal:
-            terminal = request.POST.get('terminal')
-        request.session['terminal'] = terminal
+            terminal = request.session.get('terminal', '')
+        else:
+            request.session['terminal'] = terminal
+
+        seattype = request.POST.get('seattype', '')
         if not seattype:
-            seattype = request.POST.get('seattype')
-        # request.session['seattype'] = seattype
+            seattype = request.session.get('seattype')
+        else:
+            request.session['seattype'] = seattype
+
+        date = request.POST.get('date', '')
+        if not date:
+            date = request.session.get('date')
+        else:
+            request.session['date'] = date
+
+        starter = request.POST.get('starter', '')
+        if not starter:
+            starter = request.session.get('starter')
+        else:
+            request.session['starter'] = starter
 
         if (
                 not tid
@@ -73,37 +103,40 @@ def BookingTicket(request):
                           'rail/BookingTicket.html',
                           locals())
 
-        new_ti = rail.models.Trainitems.objects.filter(
+        new_ti_start = rail.models.Trainitems.objects.filter(
             ti_tid=tid, ti_arrivalstation=starter)[0]
-        departuretime = new_ti.ti_departuretime
+
+        new_ti_arrive = rail.models.Trainitems.objects.filter(
+            ti_tid=tid, ti_arrivalstation=terminal)[0]
+
+        departuretime = new_ti_start.ti_departuretime
 
         oid = str(int(
             rail.models.Orders.objects.all().order_by(
                 '-o_oid')[0].o_oid) + 1).zfill(15)
 
-        # TODO: check 是否有余票
         flag_order = 0
         try:
             with connection.cursor() as c:
-                for seattype in ['ssl', 'ssu', 'hsl',
-                                 'hsm', 'hsu', 'sse', 'hse']:
-                    c.execute('select remaining_ticket(%s, %s, %s);',
-                              [tid,
-                               date,
-                               seattype])
-                remainingsRaw = c.fetchall()
+                c.execute(
+                    '''
+                    select ctc_remaining_tickets(
+                    %s, %s, %s, %s, %s);
+                    '''
+                    ,
+                    [tid,
+                     new_ti_start.ti_seq,
+                     new_ti_arrive.ti_seq,
+                     date,
+                     seattype]
+                )
+                remRaw = c.fetchall()
             q = []
-            for r in remainingsRaw:
+            for r in remRaw:
                 q.append(r[0].lstrip('(').rstrip(')'))
-            q1 = []
-            for r in q:
-                q1.append(r.split(','))
-            q1.sort(key=takeSeq)
-            remList = [[int(s[0]), int(s[2])] for s in q1]
-            for rem in remList:
-                if rem[0] == new_ti.ti_seq:
-                    if rem[1] > 0:
-                        flag_order = 1
+            q1 = q[0].split(',')
+            if int(q1[1]) > 0:
+                flag_order = 1
 
         except:
             pass
