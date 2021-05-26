@@ -1,10 +1,10 @@
 {% extends 'base_RAIL.html' %}
 {% block title %}
-    订票
+    火车票订单生成
 {% endblock %}
 
 {% block h1-title %}
-    请输入您的订票需求
+    订单信息
 {% endblock %}
 
 {% block content %}
@@ -16,7 +16,7 @@
         </label>
         <input type="text" name="tid" id="tid"
                required
-               value={{ tid }} >
+               value={{ tid }}>
         <br> <br>
 
         <label for="start_station">
@@ -32,7 +32,7 @@
         </label>
         <input type="text" name="terminal_station" id="terminal_station"
                required
-               value={{ terminal }} >
+               value={{ terminal }}>
         <br> <br>
 
         <label for="date">
@@ -40,7 +40,7 @@
         </label>
         <input type="date" name="date" id="date"
                required
-               value={{ date }} >
+               value={{ date }}>
         <br> <br>
 
         <label for="seattype">
@@ -54,9 +54,10 @@
         <input type="radio" name="seattype" id="seattype" value="sse">软座
         <input type="radio" name="seattype" id="seattype" value="hse">硬座
         <br><br>
-        <input type="submit" value="购票">
+        <input type="submit" value="确认购买">
     </form>
     <br>
+    <a href="/rail">取消购买</a>
 {% endblock %}
 
 {% block answer %}

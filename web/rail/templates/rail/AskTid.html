@@ -1,4 +1,5 @@
 {% extends 'base_RAIL.html' %}
+{% load get_dates %}
 
 <!--查询具体车次-->
 {% block title %}
@@ -18,7 +19,8 @@
                 车次
             </label>
             <input type="text" name="tid" id="tid"
-                   required>
+                   required
+                   value={{ input_tid }}>
         </div>
         <div class="form-group">
             <label for="date">
@@ -26,7 +28,8 @@
             </label>
             <input type="date" name="date"
                    id="date"
-                   required>
+                   required
+                   value={{ date }}>
         </div>
         <br>
         <input type="submit" value="查询">
@@ -238,8 +241,8 @@
                         {% endifequal %}
                     </td>
                 </tr>
-
             </table>
+            <br>
             <input type="submit" value="买票">
             </form>
         {% endif %}

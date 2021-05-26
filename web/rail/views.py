@@ -25,6 +25,7 @@ def index(request):
     user_stat = request.session.get('user_stat', default=False)
 
     request.session['new_question'] = True
+    request.session['tid'] = ''
     try:
         del request.session['seattype']
     except:
@@ -59,6 +60,8 @@ def BookingTicket(request):
     user_id = request.session.get('user_id', default='')
     user_stat = request.session.get('user_stat', default=False)
     error_msg = ''
+
+    new_question = request.session.get('new_question', default='False')
 
     if request.method == 'POST':
         tid = request.POST.get('tid')
@@ -98,7 +101,8 @@ def BookingTicket(request):
                 or not date
                 or not seattype
         ):
-            error_msg = '抱歉, 该座无票或缺少信息, 请您检查后重新提交'
+            if not new_question:
+                error_msg = '抱歉, 该座无票或缺少信息, 请您检查后重新提交'
             return render(request,
                           'rail/BookingTicket.html',
                           locals())
@@ -238,18 +242,17 @@ def AskTid(request):
 
     new_question = request.session.get('new_question', default=True)
 
-    try:
-        input_tid = request.GET.get('tid')
-        departure_date = request.GET.get('departure_date')
-        request.session['departure_date'] = departure_date
-    except:
-        error_msg = '抱歉, 查询输入获取失败, 请重试'
-        return render(request,
-                      'rail/AskTid.html',
-                      locals(),
-                      )
+    input_tid = request.GET.get('tid')
+    if input_tid:
+        request.session['tid'] = input_tid
+    else:
+        input_tid = request.session['tid']
 
-    request.session['tid'] = str(input_tid)
+    date = request.GET.get('date')
+    if date:
+        request.session['date'] = date
+    else:
+        input_tid = request.session['tid']
 
     if not input_tid:
         if not new_question:
@@ -283,7 +286,7 @@ def AskTid(request):
                                  'hsm', 'hsu', 'sse', 'hse']:
                     c.execute('select remaining_ticket(%s, %s, %s);',
                               [input_tid,
-                               departure_date,
+                               date,
                                seattype])
                     f.append(c.fetchall())
 
