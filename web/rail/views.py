@@ -8,8 +8,10 @@ from django.template import loader
 from django.db import connection
 from django.shortcuts import render, redirect
 
+import datetime
+
 import rail.models
-from .models import Users, Stations, Trainitems
+from .models import Stations, Trainitems
 
 '''
 主页
@@ -36,6 +38,123 @@ def index(request):
                   {'user_name': user_name,
                    'user_id': user_id,
                    'user_stat': user_stat})
+
+
+'''
+需求6: 翻转需求 5 的双城
+'''
+
+#
+# def reverseBooking(request):
+#     date = request.session.get('date', '')
+#     if date :
+#         request.session['date'] = date
+#     time = "00:00:00"
+#
+#     a = request.session.get('starterCity', '')
+#     b = request.session.get('terminalCity', '')
+#
+#     terminalCity = request.session.get('starterCity', '')
+#     starterCity = request.session.get('terminalCity', '')
+#     if terminalCity:
+#         request.session['terminalCity']=terminalCity
+#
+#     if starterCity:
+#         request.session['starterCity']:starterCity
+#     return render(request,
+#                   'rail/AskCities.html',
+#                   locals())
+
+
+'''
+需求 5: A to B
+'''
+
+
+def AskCities(request):
+    user_name = request.session.get('user_name', default='')
+    user_id = request.session.get('user_id', default='')
+    user_stat = request.session.get('user_stat', default=False)
+    error_msg = ''
+
+    # new_question = request.session.get('new_question', default='False')
+
+    if request.method == 'POST':
+        terminalCity = request.POST.get('terminalCity')
+        if not terminalCity:
+            terminalCity = request.session.get('terminalCity', '')
+        else:
+            request.session['terminalCity'] = terminalCity
+
+        starterCity = request.POST.get('starterCity', '')
+        if not starterCity:
+            starterCity = request.session.get('starterCity')
+        else:
+            request.session['starterCity'] = starterCity
+
+        date = request.POST.get('date', '')
+        if not date:
+            date = request.session.get('date')
+        else:
+            request.session['date'] = date
+
+        time = request.POST.get('time', '')
+        if not time:
+            time = request.session.get('time')
+        else:
+            request.session['time'] = time
+
+        askCity = request.POST.get('askCity')
+        if not askCity:
+            askCity = request.session['askCity'] if request.session['askCity'] else '0'
+        else:
+            request.session['askCity'] = askCity
+
+        if askCity == '1':
+            tmp = starterCity
+            starterCity = terminalCity
+            terminalCity = tmp
+        print(starterCity, terminalCity)
+
+        # TODO: 查找nonstop
+        try:
+            with connection.cursor() as c0:
+                c0.execute(
+                    """
+                    select *
+                    from
+                        city_to_city_none_stop_total(%s,%s,%s,%s)
+                        as total
+                    where
+                        total.cheapest_price < 10000
+                    """
+                    , [starterCity, terminalCity, time, date]
+                )
+                f0 = c0.fetchall()
+        except:
+            pass
+
+        # TODO: 查找onestop
+        try:
+            with connection.cursor() as c1:
+                c1.execute(
+                    """
+                    select *
+                    from
+                        city_to_city_one_stop_total(%s,%s,%s,%s)
+                        as total
+                    where
+                        total.ctc_cheapest_price < 10000
+                    """,
+                    [starterCity, terminalCity, time, date]
+                )
+                f1 = c1.fetchall()
+        except:
+            pass
+
+    return render(request,
+                  'rail/AskCities.html',
+                  locals())
 
 
 '''
@@ -127,15 +246,14 @@ def CancelMyOrders(request):
     user_id = request.session.get('user_id', default='')
     user_stat = request.session.get('user_stat', default=False)
 
-    date = request.POST.get('date', '')
-    if not date:
-        date = request.session.get('date')
-    else:
-        request.session['date'] = date
-
     if request.method == 'POST':
+        date = request.POST.get('date', '')
+        if not date:
+            date = request.session.get('date')
+        else:
+            request.session['date'] = date
         cancel_oid = request.POST.get('cancel', default='')
-        print(cancel_oid)
+        # print(cancel_oid)
         try:
             order_cc = rail.models.Orders.objects.get(
                 o_oid=cancel_oid)
@@ -158,15 +276,15 @@ def CancelMyOrders(request):
                               locals())
         except:
             pass
-    if date:
-        orderList = list(rail.models.Orders.objects.filter(
-            o_idnumber=user_id, o_departuredate__gte=date
-        ).values('o_oid', 'o_tid',
-                 'o_departuredate',
-                 'o_departuretime',
-                 'o_departurestation', 'o_seattype',
-                 'o_arrivalstation', 'o_orderstatus',
-                 ))
+        if date:
+            orderList = list(rail.models.Orders.objects.filter(
+                o_idnumber=user_id, o_departuredate__gte=date
+            ).values('o_oid', 'o_tid',
+                     'o_departuredate',
+                     'o_departuretime',
+                     'o_departurestation', 'o_seattype',
+                     'o_arrivalstation', 'o_orderstatus',
+                     ))
     msg = 'Maybe flaw here...'
     return render(request,
                   'rail/ShowMyOrders.html',
@@ -233,19 +351,6 @@ def ShowMyOrders(request):
     return render(request,
                   'rail/ShowMyOrders.html',
                   locals())
-
-
-'''
-还没做完
-需求6: 翻转需求 5 的双城
-'''
-
-
-def reverseBooking(requset):
-    new_date = requset.session.get('date', '')
-    new_starter = requset.session.get('terminal', '')
-    new_terminal = requset.session.get('starter', '')
-    # AskingTwo(requset)
 
 
 '''

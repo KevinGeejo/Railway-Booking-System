@@ -1,0 +1,69 @@
+{% extends 'base_RAIL.html' %}
+{% load get_dates %}
+
+{% block title %}
+    出行方案查询
+{% endblock %}
+
+{% block h1-title %}
+    出行方案查询
+{% endblock %}
+
+
+{% block content %}
+    <form method="post" action="/rail/AskCities/">
+        {% csrf_token %}
+
+        <label for="starterCity">
+            出发城市
+        </label>
+        <input type="text" name="starterCity" id="starterCity"
+               required
+               value={{ starterCity }}>
+        <br> <br>
+
+        <label for="terminalCity">
+            到达城市
+        </label>
+        <input type="text" name="terminalCity" id="terminalCity"
+               required
+               value={{ terminalCity }}>
+        <br> <br>
+
+        <label for="date">
+            出发日期
+        </label>
+        <input type="date" name="date" id="date"
+               required
+               value={% if date %}{{ date }}
+                   {% else %}{% tomorrow "%Y-%m-%d" %}
+               {% endif %}>
+        <br> <br>
+
+        <label for="time">
+            出发时间
+        </label>
+        <input type="time" name="time" id="time"
+               required
+               value="00:00:00">
+        <br> <br>
+        <input type="radio" name="askCity" id="normal" value="0">当程
+        <input type="radio" name="askCity" id="reverse" value="1">返程
+        <input type="submit">
+    </form>
+    <br>
+    <br>
+
+{% endblock %}
+
+{% block answer %}
+    {{ f0 }}
+    <br>
+    <br>
+    <br>
+    {{ f1 }}
+
+
+{% endblock %}
+
+
