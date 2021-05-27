@@ -2,23 +2,23 @@
 {% load get_dates %}
 
 {% block title %}
-    {{ user }}的订单
+    {{ user_name }}的订单
 {% endblock %}
 
 {% block h1-title %}
-    {{ user }} 的订单
+    {{ user_name }} 的订单
 {% endblock %}
 
 {% block content %}
-    <form method="get" action="/rail/ShowMyOrders/">
+    <form method="post" action="/rail/ShowMyOrders/">
         {% csrf_token %}
         <div class="form-group">
             <label for="date">
                 查看不早于
                 <input type="date" name="date"
-                   id="date"
-                   required
-                   value={% if date %}{{ date }}{% else %}{{ tomorrow }}{% endif %}>
+                       id="date"
+                       required
+                       value={{ date }}>
                 出发的订单:
             </label>
         </div>
@@ -29,5 +29,36 @@
 {% endblock %}
 
 {% block answer %}
-
+    {% if orderList %}
+        <table style="border-width: medium;
+                       border-style: solid;"
+               border="1">
+            <tr>
+                <th>订单号</th>
+                <th>车次</th>
+                <th>座位类型</th>
+                <th>费用</th>
+                <th>发车日期</th>
+                <th>发车时间</th>
+                <th>上车车站</th>
+                <th>目的车站</th>
+                <th>订单状态 (valid/cancelled)</th>
+            </tr>
+            {% for order in orderList %}
+                <tr>
+                    <th>{{ order.o_oid }}</th>
+                    <th>{{ order.o_tid }}</th>
+                    <th>{{ order.o_seattype }}</th>
+                    <th>{{ order.o_cost }}</th>
+                    <th>{{ order.o_departuredate }}</th>
+                    <th>{{ order.o_departuretime }}</th>
+                    <th>{{ order.o_departurestation }}</th>
+                    <th>{{ order.o_arrivalstation }}</th>
+                    <th>{{ order.o_orderstatus }}</th>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        抱歉, 找不到符合要求的订单.
+    {% endif %}
 {% endblock %}

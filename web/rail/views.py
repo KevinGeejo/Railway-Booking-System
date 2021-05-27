@@ -47,11 +47,16 @@ def findNum(elem):
     return elem[1]
 
 
+'''
+需求9:
+'''
+
+
 def AdminPage(request):
-    # TODO: 管理员
     # 1. 总订单数
     order_number = rail.models.Orders.objects.count()
     # 2. 总金额
+    # TODO:
 
     # 3. 热点车次 Top 10
     hot_list = list(rail.models.Orders.objects.all().values('o_tid'))
@@ -88,35 +93,94 @@ def AdminPage(request):
 '''
 
 
+# def takeSeq(elem):
+#     return int(elem[0])
+
+
+def SeeOrderCosts(orderList, seattype):
+    p1 = orderList
+    p2 = [a[0] for a in p1]
+    p3 = [a.strip(')').strip('(') for a in p2]
+    p4 = [a.split(',') for a in p3]
+    p5 = [[float(b) for b in a] for a in p4]
+    # print(p5)
+    costList = 0
+    for order in p5:
+        if seattype == 'hse':
+            costList = order[0]
+        elif seattype == 'sse':
+            costList = order[1]
+        elif seattype == 'hsu':
+            costList = order[2]
+        elif seattype == 'hsm':
+            costList = order[3]
+        elif seattype == 'hsl':
+            costList = order[4]
+        elif seattype == 'ssu':
+            costList = order[5]
+        elif seattype == 'ssl':
+            costList = order[6]
+        else:
+            costList = 0
+    return costList
+
+
 def ShowMyOrders(request):
     user_name = request.session.get('user_name', default='')
     user_id = request.session.get('user_id', default='')
     user_stat = request.session.get('user_stat', default=False)
 
-    # TODO: recv date, see as looking for 'after date'
     date = request.POST.get('date', '')
     if not date:
-        date = request.session['date']
+        date = request.session.get('date')
     else:
         request.session['date'] = date
 
+    if not date:
+        return render(request,
+                      'rail/ShowMyOrders.html',
+                      locals())
+
     # order_list: 订单号，日期、出发到达站、订单状态（是否已经取消）
     orderList = list(rail.models.Orders.objects.filter(
-        o_idnumber=user_id, o_departuredate__gte=date))
-    if not orderList:
-        have_order = 0
-    else:
-        have_order = 1
+        o_idnumber=user_id, o_departuredate__gte=date
+    ).values('o_oid', 'o_tid',
+             'o_departuredate',
+             'o_departuretime',
+             'o_departurestation', 'o_seattype',
+             'o_arrivalstation', 'o_orderstatus',
+             ))
 
-    # 总票价
-    costList = []
-    for order in orderList:
-        order_begin = order.o_departurestation
-        order_end = order.o_arrivalstation
-        order_tid = order.o_tid
-        order_seat = order.o_seattype
-        # TODO: 算价格
-        # rail.models.Trainitems.objects.filter(ti_arrivalstation=order_end, ti_sorder_seat)
+    if not orderList:
+        return render(request,
+                      'rail/ShowMyOrders.html',
+                      locals())
+    else:
+        for item in orderList:
+            o_tid = item['o_tid']
+            o_oid = item['o_oid']
+            o_departurestation = item['o_departurestation']
+            o_arrivalstation = item['o_arrivalstation']
+            o_seattype = str(item['o_seattype'])
+            o_orderstatus = item['o_orderstatus']
+            cost = 0
+
+            try:
+                with connection.cursor() as c:
+                    c.execute(
+                        '''
+                        select check_seat_price(%s,%s,%s);
+                        ''',
+                        [o_tid,
+                         o_departurestation,
+                         o_arrivalstation]
+                    )
+                    f = list(c.fetchall())
+                    cost = SeeOrderCosts(f, o_seattype)
+            except:
+                pass
+
+            item['o_cost'] = cost
 
     return render(request,
                   'rail/ShowMyOrders.html',

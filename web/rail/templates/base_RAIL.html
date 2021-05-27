@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}
-    My amazing site
+    订票系统为您服务
 {% endblock %}
 
 {% block sidebar %}
@@ -29,8 +29,7 @@
 {% endblock %}
 
 {% block header_in_body %}
-    {# TODO: order info #}
-    <a href="order">查看 {{ user_name }} 的信息</a>
+    <a href="/rail/ShowMyOrders/">查看 {{ user_name }} 的订单信息</a>
 {% endblock %}
 
 {% block footer %}
