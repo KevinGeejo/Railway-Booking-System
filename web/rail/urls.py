@@ -28,6 +28,10 @@ urlpatterns = [
             views.ShowMyOrders,
             name="ShowMyOrders"),
 
+    re_path(r'^CancelMyOrders/',
+            views.CancelMyOrders,
+            name="CancelMyOrders"),
+
     re_path(r'^AdminPage/',
             views.AdminPage,
             name="AdminPage")

@@ -47,11 +47,6 @@ def findNum(elem):
     return elem[1]
 
 
-'''
-需求9:
-'''
-
-
 def AdminPage(request):
     # 1. 总订单数
     order_number = rail.models.Orders.objects.count()
@@ -99,10 +94,6 @@ def AdminPage(request):
 '''
 
 
-# def takeSeq(elem):
-#     return int(elem[0])
-
-
 def SeeOrderCosts(orderList, seattype):
     p1 = orderList
     p2 = [a[0] for a in p1]
@@ -129,6 +120,57 @@ def SeeOrderCosts(orderList, seattype):
         else:
             costList = 0
     return costList
+
+
+def CancelMyOrders(request):
+    user_name = request.session.get('user_name', default='')
+    user_id = request.session.get('user_id', default='')
+    user_stat = request.session.get('user_stat', default=False)
+
+    date = request.POST.get('date', '')
+    if not date:
+        date = request.session.get('date')
+    else:
+        request.session['date'] = date
+
+    if request.method == 'POST':
+        cancel_oid = request.POST.get('cancel', default='')
+        print(cancel_oid)
+        try:
+            order_cc = rail.models.Orders.objects.get(
+                o_oid=cancel_oid)
+            if order_cc:
+                print(order_cc)
+                order_cc.o_orderstatus = 'cancelled'
+                order_cc.save()
+                msg = '取消成功!'
+                if date:
+                    orderList = list(rail.models.Orders.objects.filter(
+                        o_idnumber=user_id, o_departuredate__gte=date
+                    ).values('o_oid', 'o_tid',
+                             'o_departuredate',
+                             'o_departuretime',
+                             'o_departurestation', 'o_seattype',
+                             'o_arrivalstation', 'o_orderstatus',
+                             ))
+                return render(request,
+                              'rail/ShowMyOrders.html',
+                              locals())
+        except:
+            pass
+    if date:
+        orderList = list(rail.models.Orders.objects.filter(
+            o_idnumber=user_id, o_departuredate__gte=date
+        ).values('o_oid', 'o_tid',
+                 'o_departuredate',
+                 'o_departuretime',
+                 'o_departurestation', 'o_seattype',
+                 'o_arrivalstation', 'o_orderstatus',
+                 ))
+    msg = 'Maybe flaw here...'
+    return render(request,
+                  'rail/ShowMyOrders.html',
+                  locals())
 
 
 def ShowMyOrders(request):
