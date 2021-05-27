@@ -56,7 +56,13 @@ def AdminPage(request):
     # 1. 总订单数
     order_number = rail.models.Orders.objects.count()
     # 2. 总金额
-    # TODO:
+    try:
+        with connection.cursor() as c:
+            c.execute("select check_total_price();")
+            f = c.fetchall()
+            cost = float(f[0][0])
+    except:
+        cost = 0
 
     # 3. 热点车次 Top 10
     hot_list = list(rail.models.Orders.objects.all().values('o_tid'))

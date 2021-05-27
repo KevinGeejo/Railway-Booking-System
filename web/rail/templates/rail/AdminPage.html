@@ -18,15 +18,14 @@
         <br>
         <h2>总票价</h2>
         <br>
-        {# TODO #}
-
+        该站点共售票价值 {{ cost }} 元
+        <br>
         <h2>热点车次 Top 10</h2>
         <ol>
             {% for h in true_hot %}
                 <li>{{ h.0 }} 次</li>
             {% endfor %}
         </ol>
-
         <br>
         <h2>注册用户列表</h2>
         <br>
