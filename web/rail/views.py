@@ -69,6 +69,13 @@ def AdminPage(request):
     # 4. 注册用户列表
     userList = list(rail.models.Users.objects.all())
     # 5. 所有用户的订单
+    user_order_dict = {}
+    for user in userList:
+        userId = user.u_idnumber
+        user_order_dict[user] = list(
+            rail.models.Orders.objects.filter(
+                o_idnumber=userId))
+    print(user_order_dict)
 
     # 结束
     return render(request,

@@ -12,17 +12,24 @@
 
     {% block content %}
         <h2>总订单数</h2>
+        <br>
         目前有 {{ order_number }} 份订单.
+
+        <br>
         <h2>总票价</h2>
+        <br>
         {# TODO #}
+
         <h2>热点车次 Top 10</h2>
         <ol>
-        {% for h in true_hot %}
-            <li>{{ h.0 }} 次</li>
-        {% endfor %}
+            {% for h in true_hot %}
+                <li>{{ h.0 }} 次</li>
+            {% endfor %}
         </ol>
+
+        <br>
         <h2>注册用户列表</h2>
-        <p style="font-weight: lighter">
+        <br>
         <table style="border-width: medium;
                        border-style: solid;"
                border="1">
@@ -43,9 +50,38 @@
                 </tr>
             {% endfor %}
         </table>
-        </p>
 
+        <br>
         <h2>所有用户的订单</h2>
+        <br>
+        {% for user, orderlist in user_order_dict.items %}
+            {% if orderlist %}
+                乘客 (身份证号为 <font color="#dc143c">{{ user }}</font>) 的所有订单: <br>
+                <table style="border-width: medium; border-style: ridge;"
+                       border="1">
+                    <tr>
+                        <th> 订单号</th>
+                        <th> 出发日期</th>
+                        <th> 出发时间</th>
+                        <th> 出发站点</th>
+                        <th> 目的站点</th>
+                        <th> 订单状态 (valid/cancelled)</th>
+                    </tr>
+                    {% for order in orderlist %}
+                        <tr>
+                            <th>{{ order.o_oid }}</th>
+                            <th>{{ order.o_departuredate }}</th>
+                            <th>{{ order.o_departuretime }}</th>
+                            <th>{{ order.o_departurestation }}</th>
+                            <th>{{ order.o_arrivalstation }}</th>
+                            <th>{{ order.o_orderstatus }}</th>
+                        </tr>
+                    {% endfor %}
+                </table>
+                <br>
+            {% endif %}
+        {% endfor %}
+
     {% endblock %}
 {% endif %}
 
