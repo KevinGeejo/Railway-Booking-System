@@ -57,11 +57,91 @@
 {% endblock %}
 
 {% block answer %}
-    {{ f0 }}
-    <br>
-    <br>
-    <br>
-    {{ f1 }}
+    <h2>无换乘</h2>
+    <form method="post" action="/rail/BookingTicket/">
+        {% csrf_token %}
+        <table style="border-width: medium;
+                       border-style: solid;"
+               border="1">
+            {% if f0 %}
+                <tr>
+                    <th>车次</th>
+                    <th>出发时间</th>
+                    <th>出发车站</th>
+                    <th>到达时间</th>
+                    <th>到达车站</th>
+                    <th>软卧(上铺)</th>
+                    <th>软卧(下铺)</th>
+                    <th>硬卧(下铺)</th>
+                    <th>硬卧(中铺)</th>
+                    <th>硬卧(上铺)</th>
+                    <th>软座</th>
+                    <th>硬座</th>
+                    <th style="color: mediumblue; font-weight: bold">余票</th>
+                </tr>
+                {% for f in f0 %}
+                    <tr>
+                        <th>{{ f.tid }}</th>
+                        <th>{{ f.sta_time }}</th>
+                        <th>{{ f.sta_station }}</th>
+                        <th>{{ f.arr_time }}</th>
+                        <th>{{ f.arr_station }}</th>
+
+                        <th>{% ifnotequal ssl_r 0 %}
+                            {{ f.pr_ssl }}
+                        {% else %}
+                            无票
+                        {% endifnotequal %}</th>
+                        <th>{% ifnotequal ssu_r 0 %}
+                            {{ f.pr_ssu }}
+                        {% else %}
+                            无票
+                        {% endifnotequal %}</th>
+                        <th>{% ifnotequal hsl_r 0 %}
+                            {{ f.pr_hsl }}
+                        {% else %}
+                            无票
+                        {% endifnotequal %}</th>
+                        <th>{% ifnotequal hsm_r 0 %}
+                            {{ f.pr_hsm }}
+                        {% else %}
+                            无票
+                        {% endifnotequal %}</th>
+                        <th>{% ifnotequal hsu_r 0 %}
+                            {{ f.pr_hsu }}
+                        {% else %}
+                            无票
+                        {% endifnotequal %}</th>
+                        <th>{% ifnotequal sse_r 0 %}
+                            {{ f.pr_sse }}
+                        {% else %}
+                            无票
+                        {% endifnotequal %}</th>
+                        <th>{% ifnotequal hse_r 0 %}
+                            {{ f.pr_hse }}
+                        {% else %}
+                            无票
+                        {% endifnotequal %}</th>
+
+                        <th style="color: mediumblue">
+                            <label for="terminal">
+                                <input type="radio"
+                                       name="buy"
+                                       id={{ f.tid }}
+                                               value={{ f.tid }}>
+                            </label>为此行程购票
+                        </th>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+        </table>
+        <br><br><br>
+        <h2>一次换乘</h2>
+
+
+        <input type="submit" value="前往生成订单">
+    </form>
+
 
 
 {% endblock %}

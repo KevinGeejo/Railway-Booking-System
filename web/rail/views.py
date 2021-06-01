@@ -42,33 +42,18 @@ def index(request):
 
 '''
 需求6: 翻转需求 5 的双城
-'''
 
-#
-# def reverseBooking(request):
-#     date = request.session.get('date', '')
-#     if date :
-#         request.session['date'] = date
-#     time = "00:00:00"
-#
-#     a = request.session.get('starterCity', '')
-#     b = request.session.get('terminalCity', '')
-#
-#     terminalCity = request.session.get('starterCity', '')
-#     starterCity = request.session.get('terminalCity', '')
-#     if terminalCity:
-#         request.session['terminalCity']=terminalCity
-#
-#     if starterCity:
-#         request.session['starterCity']:starterCity
-#     return render(request,
-#                   'rail/AskCities.html',
-#                   locals())
-
-
-'''
 需求 5: A to B
 '''
+
+
+def dictfetchall(cursor):
+    "将游标返回的结果保存到一个字典对象中"
+    desc = cursor.description
+    return [
+        dict(zip([col[0] for col in desc], row))
+        for row in cursor.fetchall()
+    ]
 
 
 def AskCities(request):
@@ -106,7 +91,7 @@ def AskCities(request):
 
         askCity = request.POST.get('askCity')
         if not askCity:
-            askCity = request.session['askCity'] if request.session['askCity'] else '0'
+            askCity = '0'
         else:
             request.session['askCity'] = askCity
 
@@ -114,7 +99,7 @@ def AskCities(request):
             tmp = starterCity
             starterCity = terminalCity
             terminalCity = tmp
-        print(starterCity, terminalCity)
+        # print(starterCity, terminalCity)
 
         # TODO: 查找nonstop
         try:
@@ -130,7 +115,10 @@ def AskCities(request):
                     """
                     , [starterCity, terminalCity, time, date]
                 )
-                f0 = c0.fetchall()
+                f0 = dictfetchall(c0)
+                request.session['buy_one'] = str(f0)
+
+
         except:
             pass
 
@@ -148,7 +136,8 @@ def AskCities(request):
                     """,
                     [starterCity, terminalCity, time, date]
                 )
-                f1 = c1.fetchall()
+                f1 = dictfetchall(c1)
+                request.session['buy_two'] = str(f1)
         except:
             pass
 
@@ -200,7 +189,6 @@ def AdminPage(request):
         user_order_dict[user] = list(
             rail.models.Orders.objects.filter(
                 o_idnumber=userId))
-    print(user_order_dict)
 
     # 结束
     return render(request,
@@ -258,7 +246,7 @@ def CancelMyOrders(request):
             order_cc = rail.models.Orders.objects.get(
                 o_oid=cancel_oid)
             if order_cc:
-                print(order_cc)
+                # print(order_cc)
                 order_cc.o_orderstatus = 'cancelled'
                 order_cc.save()
                 msg = '取消成功!'
@@ -346,7 +334,7 @@ def ShowMyOrders(request):
             except:
                 pass
 
-            item['o_cost'] = cost
+            item['o_cost'] = cost + 5 if cost else cost
 
     return render(request,
                   'rail/ShowMyOrders.html',
@@ -367,35 +355,72 @@ def BookingTicket(request):
     new_question = request.session.get('new_question', default='False')
 
     if request.method == 'POST':
-        tid = request.POST.get('tid')
-        if not tid:
-            tid = request.session.get('tid', '')
-        else:
-            request.session['tid'] = tid
+        # TODO:
+        g = request.session['buy_one']
+        trans_tid = request.POST.get('buy')
+        f_group = eval(g)
+        f = f_group[0]
+        for p in f_group:
+            if p['tid'] == trans_tid:
+                f = p
+        if f:
+            tid = f['tid']
+            starter = f['sta_station']
 
-        terminal = request.POST.get('terminal')
-        if not terminal:
-            terminal = request.session.get('terminal', '')
-        else:
-            request.session['terminal'] = terminal
+            if not starter:
+                starter = request.session.get('starter')
+            else:
+                request.session['starter'] = starter
 
-        seattype = request.POST.get('seattype', '')
-        if not seattype:
-            seattype = request.session.get('seattype')
-        else:
-            request.session['seattype'] = seattype
+            terminal = f['arr_station']
 
-        date = request.POST.get('date', '')
-        if not date:
-            date = request.session.get('date')
-        else:
-            request.session['date'] = date
+            if not starter:
+                starter = request.session.get('starter')
+            else:
+                request.session['starter'] = starter
 
-        starter = request.POST.get('starter', '')
-        if not starter:
-            starter = request.session.get('starter')
+            date = request.POST.get('date', '')
+            if not date:
+                date = request.session.get('date')
+            else:
+                request.session['date'] = date
+
+            seattype = request.POST.get('seattype', '')
+            if not seattype:
+                seattype = request.session.get('seattype')
+            else:
+                request.session['seattype'] = seattype
+
         else:
-            request.session['starter'] = starter
+            tid = request.POST.get('tid')
+            if not tid:
+                tid = request.session.get('tid', '')
+            else:
+                request.session['tid'] = tid
+
+            terminal = request.POST.get('terminal')
+            if not terminal:
+                terminal = request.session.get('terminal', '')
+            else:
+                request.session['terminal'] = terminal
+
+            seattype = request.POST.get('seattype', '')
+            if not seattype:
+                seattype = request.session.get('seattype')
+            else:
+                request.session['seattype'] = seattype
+
+            date = request.POST.get('date', '')
+            if not date:
+                date = request.session.get('date')
+            else:
+                request.session['date'] = date
+
+            starter = request.POST.get('starter', '')
+            if not starter:
+                starter = request.session.get('starter')
+            else:
+                request.session['starter'] = starter
 
         if (
                 not tid
