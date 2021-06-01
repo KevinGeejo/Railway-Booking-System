@@ -2,13 +2,13 @@
 
 ## Project Schedule
 
-### DDL Fighters' Schedule/ Target
+### Recent Target
 
-- [ ] Basic: Users can do queries, buy tickets and manage their orders
-- [ ] Medium: Administrator can see overall data (**use django's admin tool** or **implement another set of logic**)
-- [ ] Advance: Polish the website
+- [x] Basic: Users can do queries, buy tickets and manage their orders
+- [x] Medium: Administrator can see overall data (**use django's admin tool** or **implement another set of logic**)
+- [ ] Advanced: Polish the website
 
-### Original Schedule
+### Schedule
 
 - [x] **(Due 5.5)** Finish designing part of the database: ER graph, BCNF-normalization, schema
 - [x] **(Due 5.5)** Finish design doc 1
@@ -21,14 +21,12 @@
   [Overdue] Polish the front-end design
 
   [Overdue] Finish design doc 2
-- [ ] **(Due 5.26)** Prepare for presentation
-- [ ] **(At 5.27)** Do presentation at class
+- [x] **(Due 5.26)** Prepare for presentation
+- [x] **(At 5.27)** Do presentation at class
 
 ## Repo Structure
 
 coming soon...
-
-
 
 ## Usages
 
@@ -36,7 +34,6 @@ coming soon...
 
 ```
 administrator username: admin
-password: 123
 email: zhengxuzhou18@mails.ucas.edu.cn
 ```
 

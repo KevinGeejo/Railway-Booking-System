@@ -346,7 +346,7 @@ def BookingTicket(request):
     user_name = request.session.get('user_name', default='')
     user_id = request.session.get('user_id', default='')
     user_stat = request.session.get('user_stat', default=False)
-    error_msg = ''
+    pop_msg = ''
 
     new_question = request.session.get('new_question', default='False')
 
@@ -389,7 +389,7 @@ def BookingTicket(request):
                 or not seattype
         ):
             if not new_question:
-                error_msg = '抱歉, 该座无票或缺少信息, 请您检查后重新提交'
+                pop_msg = '抱歉, 该座无票或缺少信息, 请您检查后重新提交'
             return render(request,
                           'rail/BookingTicket.html',
                           locals())
@@ -452,21 +452,21 @@ def BookingTicket(request):
                             arrival
                         ]
                     )
-                error_msg = '订票成功! 请管理员喝一杯靓靓的 beer'
+                pop_msg = '订票成功! 请管理员喝一杯靓靓的 beer'
                 return render(request,
                               'rail/BookingTicket.html',
                               locals())
             except:
-                error_msg = '订票失败! 数据库正在饮茶, 请立刻通知管理员'
+                pop_msg = '订票失败! 数据库正在饮茶, 请立刻通知管理员'
                 return render(request,
                               'rail/BookingTicket.html',
                               locals())
         else:
-            error_msg = '订票失败! 似乎没有票了!'
+            pop_msg = '订票失败! 似乎没有票了!'
             return render(request,
                           'rail/BookingTicket.html',
                           locals())
-    error_msg = '订票失败! 请尝试再次订票'
+    pop_msg = '订票失败! 请尝试再次订票'
     return render(request,
                   'rail/BookingTicket.html',
                   locals())
