@@ -14,133 +14,135 @@
     <form method="post" action="/rail/AskCities/">
         {% csrf_token %}
 
-        <label for="starterCity">
-            出发城市
-        </label>
-        <input type="text" name="starterCity" id="starterCity"
+        <label for="departureCity">出发城市</label>
+        <input type="text" name="departureCity" id="departureCity"
                required
-               value={{ starterCity }}>
-        <br> <br>
+               value={{ departureCity }}>
+        <br><br>
 
-        <label for="terminalCity">
-            到达城市
-        </label>
-        <input type="text" name="terminalCity" id="terminalCity"
+        <label for="arrivalCity">到达城市</label>
+        <input type="text" name="arrivalCity" id="arrivalCity"
                required
-               value={{ terminalCity }}>
-        <br> <br>
+               value={{ arrivalCity }}>
+        <br><br>
 
-        <label for="date">
-            出发日期
-        </label>
+        <label for="date">出发日期</label>
         <input type="date" name="date" id="date"
                required
                value={% if date %}{{ date }}
                    {% else %}{% tomorrow "%Y-%m-%d" %}
                {% endif %}>
-        <br> <br>
+        <br><br>
 
-        <label for="time">
-            出发时间
-        </label>
+        <label for="time">出发时间</label>
         <input type="time" name="time" id="time"
                required
                value="00:00:00">
-        <br> <br>
-        <input type="radio" name="askCity" id="normal" value="0">当程
-        <input type="radio" name="askCity" id="reverse" value="1">返程
-        <input type="submit">
+        <br><br>
+        <label for="normal">当程</label>
+        <input checked="true"
+               id="normal"
+               name="askCitySeq"
+               type="radio"
+               value="normal">
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <label for="reverse">返程</label>
+        <input type="radio"
+               name="askCitySeq"
+               id="reverse"
+               value="reverse">
+        <br><br>
+        <button type="submit">查询行程</button>
     </form>
-    <br>
-    <br>
+    <br><br>
 
 {% endblock %}
 
 {% block answer %}
-    <h2>无换乘</h2>
-    <form method="post" action="/rail/BookingTicket/">
-        {% csrf_token %}
-        <table style="border-width: medium;
-                       border-style: solid;"
-               border="1">
-            {% if f0 %}
+    <h2>直达方案</h2>
+    <table style="border-width: medium; border-style: solid;"
+           border="1">
+        {% if fetch_tmp_0 %}
+            <tr>
+                <th>车次</th>
+                <th>出发时间</th>
+                <th>出发车站</th>
+                <th>到达时间</th>
+                <th>到达车站</th>
+                <th>软卧(上)</th>
+                <th>软卧(下)</th>
+                <th>硬卧(下)</th>
+                <th>硬卧(中)</th>
+                <th>硬卧(上)</th>
+                <th>软座</th>
+                <th>硬座</th>
+                <th style="color: mediumblue; font-weight: bold">订票链接</th>
+            </tr>
+            {% for f in fetch_tmp_0 %}
                 <tr>
-                    <th>车次</th>
-                    <th>出发时间</th>
-                    <th>出发车站</th>
-                    <th>到达时间</th>
-                    <th>到达车站</th>
-                    <th>软卧(上铺)</th>
-                    <th>软卧(下铺)</th>
-                    <th>硬卧(下铺)</th>
-                    <th>硬卧(中铺)</th>
-                    <th>硬卧(上铺)</th>
-                    <th>软座</th>
-                    <th>硬座</th>
-                    <th style="color: mediumblue; font-weight: bold">余票</th>
+                    <th>{{ f.tid }}</th>
+                    <th>{{ f.sta_time }}</th>
+                    <th>{{ f.sta_station }}</th>
+                    <th>{{ f.arr_time }}</th>
+                    <th>{{ f.arr_station }}</th>
+
+                    <th>{% ifnotequal f.ssl_r 0 %}
+                        ￥{{ f.pr_ssl }}
+                    {% else %}
+                        -
+                    {% endifnotequal %}</th>
+                    <th>{% ifnotequal f.ssu_r 0 %}
+                        ￥{{ f.pr_ssu }}
+                    {% else %}
+                        -
+                    {% endifnotequal %}</th>
+                    <th>{% ifnotequal f.hsl_r 0 %}
+                        ￥{{ f.pr_hsl }}
+                    {% else %}
+                        -
+                    {% endifnotequal %}</th>
+                    <th>{% ifnotequal f.hsm_r 0 %}
+                        ￥{{ f.pr_hsm }}
+                    {% else %}
+                        -
+                    {% endifnotequal %}</th>
+                    <th>{% ifnotequal f.hsu_r 0 %}
+                        ￥{{ f.pr_hsu }}
+                    {% else %}
+                        -
+                    {% endifnotequal %}</th>
+                    <th>{% ifnotequal f.sse_r 0 %}
+                        ￥{{ f.pr_sse }}
+                    {% else %}
+                        -
+                    {% endifnotequal %}</th>
+                    <th>{% ifnotequal f.hse_r 0 %}
+                        ￥{{ f.pr_hse }}
+                    {% else %}
+                        -
+                    {% endifnotequal %}</th>
+
+                    <th style="color: mediumblue">
+                        <form method="post" action="/rail/BookingTicket/">
+                            {% csrf_token %}
+                            <input type="hidden" name="tid" value={{ f.tid }}>
+                            <input type="hidden" name="departure" value={{ f.sta_station }}>
+                            <input type="hidden" name="arrival" value={{ f.arr_station }}>
+                            <input type="hidden" name="date"
+                                   value={% if date %}{{ date }}
+                                       {% else %}{% tomorrow "%Y-%m-%d" %}
+                                   {% endif %}>
+                            <label for={{ f.tid }}></label>
+                            <button type="submit" name="submit" id={{ f.tid }}>生成订单</button>
+                        </form>
+                    </th>
                 </tr>
-                {% for f in f0 %}
-                    <tr>
-                        <th>{{ f.tid }}</th>
-                        <th>{{ f.sta_time }}</th>
-                        <th>{{ f.sta_station }}</th>
-                        <th>{{ f.arr_time }}</th>
-                        <th>{{ f.arr_station }}</th>
-
-                        <th>{% ifnotequal ssl_r 0 %}
-                            {{ f.pr_ssl }}
-                        {% else %}
-                            无票
-                        {% endifnotequal %}</th>
-                        <th>{% ifnotequal ssu_r 0 %}
-                            {{ f.pr_ssu }}
-                        {% else %}
-                            无票
-                        {% endifnotequal %}</th>
-                        <th>{% ifnotequal hsl_r 0 %}
-                            {{ f.pr_hsl }}
-                        {% else %}
-                            无票
-                        {% endifnotequal %}</th>
-                        <th>{% ifnotequal hsm_r 0 %}
-                            {{ f.pr_hsm }}
-                        {% else %}
-                            无票
-                        {% endifnotequal %}</th>
-                        <th>{% ifnotequal hsu_r 0 %}
-                            {{ f.pr_hsu }}
-                        {% else %}
-                            无票
-                        {% endifnotequal %}</th>
-                        <th>{% ifnotequal sse_r 0 %}
-                            {{ f.pr_sse }}
-                        {% else %}
-                            无票
-                        {% endifnotequal %}</th>
-                        <th>{% ifnotequal hse_r 0 %}
-                            {{ f.pr_hse }}
-                        {% else %}
-                            无票
-                        {% endifnotequal %}</th>
-
-                        <th style="color: mediumblue">
-                            <label for="terminal">
-                                <input type="radio"
-                                       name="buy"
-                                       id={{ f.tid }}
-                                               value={{ f.tid }}>
-                            </label>为此行程购票
-                        </th>
-                    </tr>
-                {% endfor %}
-            {% endif %}
-        </table>
-        <br><br><br>
-        <h2>一次换乘</h2>
-
-
-        <input type="submit" value="前往生成订单">
-    </form>
+            {% endfor %}
+        {% endif %}
+    </table>
+    <br><br><br>
+    <h2>中转方案</h2>
+    {# TODO #}
 
 
 

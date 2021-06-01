@@ -20,10 +20,6 @@ urlpatterns = [
             views.AskTid,
             name="AskTid"),
 
-    # re_path(r'^reverseBooking/',
-    #         views.reverseBooking,
-    #         name="reverseBooking"),
-
     re_path(r'^AskCities/',
             views.AskCities,
             name="AskCities"),

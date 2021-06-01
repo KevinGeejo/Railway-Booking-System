@@ -62,20 +62,20 @@ def AskCities(request):
     user_stat = request.session.get('user_stat', default=False)
     error_msg = ''
 
-    # new_question = request.session.get('new_question', default='False')
+    new_question = request.session.get('new_question', default='False')
 
     if request.method == 'POST':
-        terminalCity = request.POST.get('terminalCity')
-        if not terminalCity:
-            terminalCity = request.session.get('terminalCity', '')
+        arrivalCity = request.POST.get('arrivalCity')
+        if not arrivalCity:
+            arrivalCity = request.session.get('arrivalCity', '')
         else:
-            request.session['terminalCity'] = terminalCity
+            request.session['arrivalCity'] = arrivalCity
 
-        starterCity = request.POST.get('starterCity', '')
-        if not starterCity:
-            starterCity = request.session.get('starterCity')
+        departureCity = request.POST.get('departureCity', '')
+        if not departureCity:
+            departureCity = request.session.get('departureCity')
         else:
-            request.session['starterCity'] = starterCity
+            request.session['departureCity'] = departureCity
 
         date = request.POST.get('date', '')
         if not date:
@@ -89,19 +89,18 @@ def AskCities(request):
         else:
             request.session['time'] = time
 
-        askCity = request.POST.get('askCity')
-        if not askCity:
-            askCity = '0'
-        else:
-            request.session['askCity'] = askCity
+        try:
+            askCitySeq = request.POST.get('askCitySeq')
+            request.session['askCitySeq'] = askCitySeq
+        except:
+            askCitySeq = "normal"
 
-        if askCity == '1':
-            tmp = starterCity
-            starterCity = terminalCity
-            terminalCity = tmp
-        # print(starterCity, terminalCity)
+        if askCitySeq == "reverse":
+            tmp = departureCity
+            departureCity = arrivalCity
+            arrivalCity = tmp
 
-        # TODO: 查找nonstop
+        # 查找直达方案
         try:
             with connection.cursor() as c0:
                 c0.execute(
@@ -113,16 +112,13 @@ def AskCities(request):
                     where
                         total.cheapest_price < 10000
                     """
-                    , [starterCity, terminalCity, time, date]
+                    , [departureCity, arrivalCity, time, date]
                 )
-                f0 = dictfetchall(c0)
-                request.session['buy_one'] = str(f0)
-
-
+                fetch_tmp_0 = dictfetchall(c0)
         except:
             pass
 
-        # TODO: 查找onestop
+        # 查找中转方案
         try:
             with connection.cursor() as c1:
                 c1.execute(
@@ -134,10 +130,10 @@ def AskCities(request):
                     where
                         total.ctc_cheapest_price < 10000
                     """,
-                    [starterCity, terminalCity, time, date]
+                    [departureCity, arrivalCity, time, date]
                 )
-                f1 = dictfetchall(c1)
-                request.session['buy_two'] = str(f1)
+                fetch_tmp_1 = dictfetchall(c1)
+                request.session['buy_two'] = str(fetch_tmp_1)
         except:
             pass
 
@@ -207,7 +203,7 @@ def SeeOrderCosts(orderList, seattype):
     p3 = [a.strip(')').strip('(') for a in p2]
     p4 = [a.split(',') for a in p3]
     p5 = [[float(b) for b in a] for a in p4]
-    # print(p5)
+
     costList = 0
     for order in p5:
         if seattype == 'hse':
@@ -355,77 +351,40 @@ def BookingTicket(request):
     new_question = request.session.get('new_question', default='False')
 
     if request.method == 'POST':
-        # TODO:
-        g = request.session['buy_one']
-        trans_tid = request.POST.get('buy')
-        f_group = eval(g)
-        f = f_group[0]
-        for p in f_group:
-            if p['tid'] == trans_tid:
-                f = p
-        if f:
-            tid = f['tid']
-            starter = f['sta_station']
-
-            if not starter:
-                starter = request.session.get('starter')
-            else:
-                request.session['starter'] = starter
-
-            terminal = f['arr_station']
-
-            if not starter:
-                starter = request.session.get('starter')
-            else:
-                request.session['starter'] = starter
-
-            date = request.POST.get('date', '')
-            if not date:
-                date = request.session.get('date')
-            else:
-                request.session['date'] = date
-
-            seattype = request.POST.get('seattype', '')
-            if not seattype:
-                seattype = request.session.get('seattype')
-            else:
-                request.session['seattype'] = seattype
-
+        tid = request.POST.get('tid')
+        if not tid:
+            tid = request.session.get('tid', '')
         else:
-            tid = request.POST.get('tid')
-            if not tid:
-                tid = request.session.get('tid', '')
-            else:
-                request.session['tid'] = tid
+            request.session['tid'] = tid
 
-            terminal = request.POST.get('terminal')
-            if not terminal:
-                terminal = request.session.get('terminal', '')
-            else:
-                request.session['terminal'] = terminal
+        date = request.POST.get('date', '')
+        if not date:
+            date = request.session.get('date')
+        else:
+            request.session['date'] = date
 
-            seattype = request.POST.get('seattype', '')
-            if not seattype:
-                seattype = request.session.get('seattype')
-            else:
-                request.session['seattype'] = seattype
+        departure = request.POST.get('departure', '')
+        if not departure:
+            departure = request.session.get('departure')
+        else:
+            request.session['departure'] = departure
 
-            date = request.POST.get('date', '')
-            if not date:
-                date = request.session.get('date')
-            else:
-                request.session['date'] = date
+        arrival = request.POST.get('arrival')
+        if not arrival:
+            arrival = request.session.get('arrival', '')
+        else:
+            request.session['arrival'] = arrival
 
-            starter = request.POST.get('starter', '')
-            if not starter:
-                starter = request.session.get('starter')
-            else:
-                request.session['starter'] = starter
+        seattype = request.POST.get('seattype', '')
+        if not seattype:
+            seattype = request.session.get('seattype')
+        else:
+            request.session['seattype'] = seattype
 
         if (
                 not tid
-                or not starter
-                or not terminal
+                or not departure
+                or not arrival
                 or not date
                 or not seattype
         ):
@@ -436,10 +395,10 @@ def BookingTicket(request):
                           locals())
 
         new_ti_start = rail.models.Trainitems.objects.filter(
-            ti_tid=tid, ti_arrivalstation=starter)[0]
+            ti_tid=tid, ti_arrivalstation=departure)[0]
 
         new_ti_arrive = rail.models.Trainitems.objects.filter(
-            ti_tid=tid, ti_arrivalstation=terminal)[0]
+            ti_tid=tid, ti_arrivalstation=arrival)[0]
 
         departuretime = new_ti_start.ti_departuretime
 
@@ -489,8 +448,8 @@ def BookingTicket(request):
                             departuretime,
                             seattype,
                             'valid',
-                            starter,
-                            terminal
+                            departure,
+                            arrival
                         ]
                     )
                 error_msg = '订票成功! 请管理员喝一杯靓靓的 beer'
@@ -558,57 +517,54 @@ def AskTidSeeRemain(rt_list):
 
 
 def AskTid(request):
-    try:
-        del request.session['seattype']
-    except:
-        pass
+    request.session['seattype'] = ''
+
     user_name = request.session.get('user_name', default='')
     user_id = request.session.get('user_id', default='')
     user_stat = request.session.get('user_stat', default=False)
     error_msg = ''
-    tid_info, starter, terminal, mids = [], [], [], []
+    tid_info, departure, arrival, mids = [], [], [], []
 
     new_question = request.session.get('new_question', default=True)
 
-    input_tid = request.GET.get('tid')
-    if input_tid:
+    try:
+        input_tid = request.GET.get('tid')
         request.session['tid'] = input_tid
-    else:
+    except:
         input_tid = request.session['tid']
 
-    date = request.GET.get('date')
-    if date:
+    try:
+        date = request.GET.get('date')
         request.session['date'] = date
-    else:
-        input_tid = request.session['tid']
+    except:
+        date = request.session['date']
 
     if not input_tid:
         if not new_question:
-            error_msg = '抱歉, 查询输入获取失败, 请重试'
+            error_msg = '抱歉, 查询输入失败, 请重试'
 
     else:
         # ORM method
         tid_info = list(
             Trainitems.objects.filter(
-                ti_tid=input_tid
-            ).order_by('ti_seq'))
+                ti_tid=input_tid).order_by('ti_seq'))
 
         if not tid_info:
-            error_msg = '抱歉, 查询输入获取结果为空, 请重试'
+            error_msg = '抱歉, 查询结果为空, 请重试'
             return render(request,
                           'rail/AskTid.html',
                           locals(),
                           )
 
-        starter = tid_info[0]
-        request.session['starter'] = str(starter.ti_arrivalstation)
+        departure = tid_info[0]
+        request.session['departure'] = str(departure.ti_arrivalstation)
 
-        terminal = tid_info[-1]
-        request.session['terminal'] = str(terminal.ti_arrivalstation)
+        arrival = tid_info[-1]
+        request.session['arrival'] = str(arrival.ti_arrivalstation)
         mids = tid_info[1:-2]
 
         try:
-            f = []
+            tmp_fetch = []
             with connection.cursor() as c:
                 for seattype in ['ssl', 'ssu', 'hsl',
                                  'hsm', 'hsu', 'sse', 'hse']:
@@ -616,14 +572,14 @@ def AskTid(request):
                               [input_tid,
                                date,
                                seattype])
-                    f.append(c.fetchall())
+                    tmp_fetch.append(c.fetchall())
 
-            remList = AskTidSeeRemain(f)
+            remList = AskTidSeeRemain(tmp_fetch)
             lastList = remList[-1]
-            # print(lastList)
 
         except:
-            pass
+            remList = []
+            lastList = []
 
     return render(request,
                   'rail/AskTid.html',
@@ -681,19 +637,3 @@ def findStationsInCity(request):
                       'user_id': user_id,
                       'user_stat': user_stat,
                   })
-
-
-'''
------------BELOW ARE TEST-----------
-'''
-
-
-def query_for_stations_in_city_static(request):
-    answer_city_list = Stations.objects.filter(s_city="北京")
-
-    # test: print stations
-    # output = ', '.join([q.question_text for q in answer_city_list])
-    # return HttpResponse(output)
-
-    context = {'answer_city_list': answer_city_list}
-    return render(request, 'rail/findStationsInCity.html', context)

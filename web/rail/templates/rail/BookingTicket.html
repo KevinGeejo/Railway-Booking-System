@@ -11,41 +11,31 @@
 
     <form method="post" action="/rail/BookingTicket/">
         {% csrf_token %}
-        <label for="tid">
-            车次
-        </label>
+        <label for="tid">车次</label>
         <input type="text" name="tid" id="tid"
                required
                value={{ tid }}>
-        <br> <br>
+        <br><br>
 
-        <label for="start_station">
-            出发车站
-        </label>
-        <input type="text" name="start_station" id="start_station"
+        <label for="departure">出发车站</label>
+        <input type="text" name="departure" id="departure"
                required
-               value={{ starter }}>
-        <br> <br>
+               value={{ departure }}>
+        <br><br>
 
-        <label for="terminal_station">
-            到达车站
-        </label>
-        <input type="text" name="terminal_station" id="terminal_station"
+        <label for="arrival">到达车站</label>
+        <input type="text" name="arrival" id="arrival"
                required
-               value={{ terminal }}>
-        <br> <br>
+               value={{ arrival }}>
+        <br><br>
 
-        <label for="date">
-            出发日期
-        </label>
+        <label for="date">出发日期</label>
         <input type="date" name="date" id="date"
                required
                value={{ date }}>
-        <br> <br>
+        <br><br>
 
-        <label for="seattype">
-            座位种类&nbsp;
-        </label>
+        <label for="seattype">座位种类&nbsp;</label>
         <input type="radio" name="seattype" id="seattype" value="ssl">软卧(下)
         <input type="radio" name="seattype" id="seattype" value="ssu">软卧(上)
         <input type="radio" name="seattype" id="seattype" value="hsl">硬卧(下)
@@ -54,14 +44,15 @@
         <input type="radio" name="seattype" id="seattype" value="sse">软座
         <input type="radio" name="seattype" id="seattype" value="hse">硬座
         <br><br>
-        <input type="submit" value="确认购买">
+        <button type="submit">确认生成订单</button>
     </form>
-    <br>
-    <a href="/rail">取消购买</a>
 {% endblock %}
 
 {% block answer %}
     {% if error_msg %}
         <p>{{ error_msg }}</p>
     {% endif %}
+    <br><br>
+    <a href="/rail">稍后订票</a>
+    <br><br>
 {% endblock %}

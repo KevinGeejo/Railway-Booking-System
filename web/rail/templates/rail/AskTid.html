@@ -15,17 +15,14 @@
     <form method="get" action="/rail/AskTid/">
         {% csrf_token %}
         <div class="form-group">
-            <label for="tid">
-                车次
-            </label>
+            <label for="tid">车次</label>
             <input type="text" name="tid" id="tid"
                    required
-                   value={{ input_tid }}>
+                   placeholder="请在此输入车次号"
+                   value={% if input_tid %}{{ input_tid }} {% endif %}>
         </div>
         <div class="form-group">
-            <label for="date">
-                出发日期
-            </label>
+            <label for="date">出发日期</label>
             <input type="date" name="date"
                    id="date"
                    required
@@ -41,211 +38,210 @@
     {% if error_msg %}
         <p>{{ error_msg }}</p>
     {% endif %}
-    <form method="post" action="/rail/BookingTicket/">
-        {# 静态信息 + 动态信息 #}
-        {% csrf_token %}
-        {% if tid_info %}
-            {{ input_tid }} 次列车的信息:
-            <br>
-            <br>
-            <table style="border-width: medium;
+    {# 静态信息 + 动态信息 #}
+    {% if tid_info %}
+        {{ input_tid }}次列车的信息:
+        <br>
+        <br>
+        <table style="border-width: medium;
                        border-style: solid;"
-                   border="1">
-                <tr>
-                    {# 表头 #}
-                    <th>站名</th>
-                    <th>到站时间</th>
-                    <th>离站时间</th>
-                    <th>软卧(上铺)</th>
-                    <th>软卧(下铺)</th>
-                    <th>硬卧(下铺)</th>
-                    <th>硬卧(中铺)</th>
-                    <th>硬卧(上铺)</th>
-                    <th>软座</th>
-                    <th>硬座</th>
-                    <th style="color: mediumblue; font-weight: bold">余票</th>
-                </tr>
+               border="1">
+            <tr>
+                {# 表头 #}
+                <th>站名</th>
+                <th>到站时间</th>
+                <th>离站时间</th>
+                <th>软卧(上铺)</th>
+                <th>软卧(下铺)</th>
+                <th>硬卧(下铺)</th>
+                <th>硬卧(中铺)</th>
+                <th>硬卧(上铺)</th>
+                <th>软座</th>
+                <th>硬座</th>
+                <th style="color: mediumblue; font-weight: bold">余票</th>
+            </tr>
 
-                {# 始发站 #}
+            {# 始发站 #}
+            <tr>
+                <td>{{ departure.ti_arrivalstation }}</td>
+                <td>-</td>
+                <td>
+                    {{ departure.ti_departuretime }}
+                </td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td style="color: mediumblue">-</td>
+            </tr>
+
+            {# 中间站 #}
+            {% for item in mids %}
                 <tr>
-                    <td>{{ starter.ti_arrivalstation }}</td>
-                    <td>-</td>
+                    <td>{{ item.ti_arrivalstation }}</td>
                     <td>
-                        {{ starter.ti_departuretime }}
-                    </td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td style="color: mediumblue">-</td>
-                </tr>
-
-                {# 中间站 #}
-                {% for item in mids %}
-                    <tr>
-                        <td>{{ item.ti_arrivalstation }}</td>
-                        <td>
-                            {{ item.ti_arrivaltime }}
-                            {% if item.ti_offsetday %}
-                                (+{{ item.ti_offsetday }})
-                            {% endif %}
-                        </td>
-                        <td>
-                            {{ item.ti_departuretime }}
-                            {% if item.ti_offsetday %}
-                                (+{{ item.ti_offsetday }})
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% ifequal item.ti_sslprice 0.0 %}
-                                -
-                            {% else %}
-                                ￥{{ item.ti_sslprice }}
-                            {% endifequal %}
-                        </td>
-                        <td>
-                            {% ifequal item.ti_ssuprice 0.0 %}
-                                -
-                            {% else %}
-                                ￥{{ item.ti_ssuprice }}
-                            {% endifequal %}
-                        </td>
-                        <td>
-                            {% ifequal item.ti_hslprice 0.0 %}
-                                -
-                            {% else %}
-                                ￥{{ item.ti_hslprice }}
-                            {% endifequal %}
-                        </td>
-                        <td>
-                            {% ifequal item.ti_hsmprice 0.0 %}
-                                -
-                            {% else %}
-                                ￥{{ item.ti_hsmprice }}
-                            {% endifequal %}
-                        </td>
-                        <td>
-                            {% ifequal item.ti_hsuprice 0.0 %}
-                                -
-                            {% else %}
-                                ￥{{ item.ti_hsuprice }}
-                            {% endifequal %}
-                        </td>
-                        <td>
-                            {% ifequal item.ti_sseprice 0.0 %}
-                                -
-                            {% else %}
-                                ￥{{ item.ti_sseprice }}
-                            {% endifequal %}
-                        </td>
-                        <td>
-                            {% ifequal item.ti_hseprice 0.0 %}
-                                -
-                            {% else %}
-                                ￥{{ item.ti_hseprice }}
-                            {% endifequal %}
-                        </td>
-                        <td style="color: mediumblue">
-                            {% for rem in remList %}
-                                {% ifequal rem.0 item.ti_seq %}
-                                    {% if rem.1 > 0 %}
-                                        <label for="terminal">
-                                            <input type="radio"
-                                                   name="terminal"
-                                                   id="terminal"
-                                                   value={{ item.ti_arrivalstation }}>
-                                        </label>购票到此站
-                                    {% endif %}
-                                {% endifequal %}
-                            {% endfor %}
-                        </td>
-                    </tr>
-                {% empty %}
-                    {# <div class="no-station">#}
-                    {# 抱歉, 没有搜索到符合条件的车次.#}
-                    {# </div>#}
-                {% endfor %}
-
-                {# 终到站 #}
-                <tr>
-                    <td>{{ terminal.ti_arrivalstation }}</td>
-                    <td>
-                        {{ terminal.ti_arrivaltime }}
-                        {% if terminal.ti_offsetday %}
-                            (+{{ terminal.ti_offsetday }})
+                        {{ item.ti_arrivaltime }}
+                        {% if item.ti_offsetday %}
+                            (+{{ item.ti_offsetday }})
                         {% endif %}
                     </td>
-                    <td>-</td>
                     <td>
-                        {% ifequal terminal.ti_sslprice 0.0 %}
+                        {{ item.ti_departuretime }}
+                        {% if item.ti_offsetday %}
+                            (+{{ item.ti_offsetday }})
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% ifequal item.ti_sslprice 0.0 %}
                             -
                         {% else %}
-                            ￥{{ terminal.ti_sslprice }}
+                            ￥{{ item.ti_sslprice }}
                         {% endifequal %}
                     </td>
                     <td>
-                        {% ifequal terminal.ti_ssuprice 0.0 %}
+                        {% ifequal item.ti_ssuprice 0.0 %}
                             -
                         {% else %}
-                            ￥{{ terminal.ti_ssuprice }}
+                            ￥{{ item.ti_ssuprice }}
                         {% endifequal %}
                     </td>
                     <td>
-                        {% ifequal terminal.ti_hslprice 0.0 %}
+                        {% ifequal item.ti_hslprice 0.0 %}
                             -
                         {% else %}
-                            ￥{{ terminal.ti_hslprice }}
+                            ￥{{ item.ti_hslprice }}
                         {% endifequal %}
                     </td>
                     <td>
-                        {% ifequal terminal.ti_hsmprice 0.0 %}
+                        {% ifequal item.ti_hsmprice 0.0 %}
                             -
                         {% else %}
-                            ￥{{ terminal.ti_hsmprice }}
+                            ￥{{ item.ti_hsmprice }}
                         {% endifequal %}
                     </td>
                     <td>
-                        {% ifequal terminal.ti_hsuprice 0.0 %}
+                        {% ifequal item.ti_hsuprice 0.0 %}
                             -
                         {% else %}
-                            ￥{{ terminal.ti_hsuprice }}
+                            ￥{{ item.ti_hsuprice }}
                         {% endifequal %}
                     </td>
                     <td>
-                        {% ifequal terminal.ti_sseprice 0.0 %}
+                        {% ifequal item.ti_sseprice 0.0 %}
                             -
                         {% else %}
-                            ￥{{ terminal.ti_sseprice }}
+                            ￥{{ item.ti_sseprice }}
                         {% endifequal %}
                     </td>
                     <td>
-                        {% ifequal terminal.ti_hseprice 0.0 %}
+                        {% ifequal item.ti_hseprice 0.0 %}
                             -
                         {% else %}
-                            ￥{{ terminal.ti_hseprice }}
+                            ￥{{ item.ti_hseprice }}
                         {% endifequal %}
                     </td>
                     <td style="color: mediumblue">
-                        {% ifequal lastList.0 terminal.ti_seq %}
-                            {% if lastList.1 > 0 %}
-                                <label for="terminal">
-                                    <input type="radio"
-                                           name="terminal"
-                                           id="terminal"
-                                           value={{ lastList.ti_arrivalstation }}>
-                                </label>购票到此站
-                            {% endif %}
-                        {% endifequal %}
+                        <form method="post" action="/rail/BookingTicket/">
+                            {% csrf_token %}
+                            <input type="hidden" name="tid" value={{ input_tid }}>
+                            <input type="hidden" name="departure" value={{ departure.ti_arrivalstation }}>
+                            <input type="hidden" name="arrival" value={{ item.ti_arrivalstation }}>
+                            <input type="hidden" name="date"
+                                   value={% if date %}{{ date }}
+                                       {% else %}{% tomorrow "%Y-%m-%d" %}
+                                   {% endif %}>
+                            <label for={{ f.tid }}></label>
+                            <button type="submit" name="submit" id={{ f.tid }}>生成订单</button>
+                        </form>
                     </td>
                 </tr>
-            </table>
-            <br>
-            <input type="submit" value="前往生成订单">
-            </form>
-        {% endif %}
+            {% empty %}
+                {# <div class="no-station">#}
+                {# 抱歉, 没有搜索到符合条件的车次.#}
+                {# </div>#}
+            {% endfor %}
+
+            {# 终到站 #}
+            <tr>
+                <td>{{ arrival.ti_arrivalstation }}</td>
+                <td>
+                    {{ arrival.ti_arrivaltime }}
+                    {% if arrival.ti_offsetday %}
+                        (+{{ arrival.ti_offsetday }})
+                    {% endif %}
+                </td>
+                <td>-</td>
+                <td>
+                    {% ifequal arrival.ti_sslprice 0.0 %}
+                        -
+                    {% else %}
+                        ￥{{ arrival.ti_sslprice }}
+                    {% endifequal %}
+                </td>
+                <td>
+                    {% ifequal arrival.ti_ssuprice 0.0 %}
+                        -
+                    {% else %}
+                        ￥{{ arrival.ti_ssuprice }}
+                    {% endifequal %}
+                </td>
+                <td>
+                    {% ifequal arrival.ti_hslprice 0.0 %}
+                        -
+                    {% else %}
+                        ￥{{ arrival.ti_hslprice }}
+                    {% endifequal %}
+                </td>
+                <td>
+                    {% ifequal arrival.ti_hsmprice 0.0 %}
+                        -
+                    {% else %}
+                        ￥{{ arrival.ti_hsmprice }}
+                    {% endifequal %}
+                </td>
+                <td>
+                    {% ifequal arrival.ti_hsuprice 0.0 %}
+                        -
+                    {% else %}
+                        ￥{{ arrival.ti_hsuprice }}
+                    {% endifequal %}
+                </td>
+                <td>
+                    {% ifequal arrival.ti_sseprice 0.0 %}
+                        -
+                    {% else %}
+                        ￥{{ arrival.ti_sseprice }}
+                    {% endifequal %}
+                </td>
+                <td>
+                    {% ifequal arrival.ti_hseprice 0.0 %}
+                        -
+                    {% else %}
+                        ￥{{ arrival.ti_hseprice }}
+                    {% endifequal %}
+                </td>
+                <td style="color: mediumblue">
+                    <form method="post" action="/rail/BookingTicket/">
+                        {% csrf_token %}
+                        <input type="hidden" name="tid" value={{ input_tid }}>
+                        <input type="hidden" name="departure" value={{ departure.ti_arrivalstation }}>
+                        <input type="hidden" name="arrival" value={{ arrival.ti_arrivalstation }}>
+                        <input type="hidden" name="date"
+                               value={% if date %}{{ date }}
+                                   {% else %}{% tomorrow "%Y-%m-%d" %}
+                               {% endif %}>
+                        <label for={{ f.tid }}></label>
+                        <button type="submit" name="submit" id={{ f.tid }}>生成订单</button>
+                    </form>
+                </td>
+            </tr>
+        </table>
+        <br>
+        <input type="submit" value="前往生成订单">
+    {% endif %}
 {% endblock %}
 
 
