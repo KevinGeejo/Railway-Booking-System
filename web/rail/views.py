@@ -27,7 +27,9 @@ def index(request):
     user_stat = request.session.get('user_stat', default=False)
 
     request.session['new_question'] = True
+    request.session['new_order'] = True
     request.session['tid'] = ''
+
     try:
         del request.session['seattype']
     except:
@@ -48,7 +50,7 @@ def index(request):
 
 
 def dictfetchall(cursor):
-    "将游标返回的结果保存到一个字典对象中"
+    # 将游标返回的结果保存到一个字典对象中
     desc = cursor.description
     return [
         dict(zip([col[0] for col in desc], row))
@@ -62,7 +64,13 @@ def AskCities(request):
     user_stat = request.session.get('user_stat', default=False)
     error_msg = ''
 
-    new_question = request.session.get('new_question', default='False')
+    new_question = request.session['new_question']
+    request.session['new_order'] = True
+
+    try:
+        del request.session['seattype']
+    except:
+        pass
 
     if request.method == 'POST':
         arrivalCity = request.POST.get('arrivalCity')
@@ -99,7 +107,9 @@ def AskCities(request):
             tmp = departureCity
             departureCity = arrivalCity
             arrivalCity = tmp
-
+            current_date = datetime.datetime.strptime(date, '%Y-%m-%d')
+            next_date = current_date + datetime.timedelta(days=1)
+            date = next_date.strftime('%Y-%m-%d')
         # 查找直达方案
         try:
             with connection.cursor() as c0:
@@ -133,7 +143,6 @@ def AskCities(request):
                     [departureCity, arrivalCity, time, date]
                 )
                 fetch_tmp_1 = dictfetchall(c1)
-                request.session['buy_two'] = str(fetch_tmp_1)
         except:
             pass
 
@@ -164,7 +173,8 @@ def AdminPage(request):
         cost = 0
 
     # 3. 热点车次 Top 10
-    hot_list = list(rail.models.Orders.objects.all().values('o_tid'))
+    hot_list = list(
+        rail.models.Orders.objects.all().values('o_tid'))
     tidList = []
     for hot in hot_list:
         tidList.append(hot['o_tid'])
@@ -184,7 +194,11 @@ def AdminPage(request):
         userId = user.u_idnumber
         user_order_dict[user] = list(
             rail.models.Orders.objects.filter(
-                o_idnumber=userId))
+                o_idnumber=userId
+            ).order_by(
+                '-o_orderstatus',
+                'o_departuredate', 'o_departuretime', 'o_oid'
+            ))
 
     # 结束
     return render(request,
@@ -225,6 +239,62 @@ def SeeOrderCosts(orderList, seattype):
     return costList
 
 
+# order_list: 订单号，日期、出发到达站、订单状态（是否已经取消）
+def calcMyOrdersSingle(request, user_id, date):
+    orderList = list(rail.models.Orders.objects.filter(
+        o_idnumber=user_id, o_departuredate__gte=date
+    ).order_by(
+        '-o_orderstatus',
+        'o_departuredate', 'o_departuretime', 'o_oid'
+    ).values('o_oid', 'o_tid',
+             'o_departuredate',
+             'o_departuretime',
+             'o_departurestation', 'o_seattype',
+             'o_arrivalstation', 'o_orderstatus',
+             ))
+
+    if not orderList:
+        orderList = []
+    else:
+        for item in orderList:
+            o_tid = item['o_tid']
+            o_departurestation = item['o_departurestation']
+            o_arrivalstation = item['o_arrivalstation']
+            o_seattype = str(item['o_seattype'])
+            cost = 0
+
+            try:
+                with connection.cursor() as c:
+                    c.execute("select check_seat_price(%s,%s,%s);",
+                              [o_tid,
+                               o_departurestation,
+                               o_arrivalstation])
+                    f = list(c.fetchall())
+                    cost = SeeOrderCosts(f, o_seattype)
+            except:
+                pass
+
+            item['o_cost'] = cost + 5 if cost else cost
+            if o_seattype == 'hse':
+                item['o_seattype_name'] = '硬座'
+            elif o_seattype == 'sse':
+                item['o_seattype_name'] = '软座'
+            elif o_seattype == 'hsu':
+                item['o_seattype_name'] = '硬卧(上)'
+            elif o_seattype == 'hsm':
+                item['o_seattype_name'] = '硬卧(中)'
+            elif o_seattype == 'hsl':
+                item['o_seattype_name'] = '硬卧(下)'
+            elif o_seattype == 'ssu':
+                item['o_seattype_name'] = '软卧(上)'
+            elif o_seattype == 'ssl':
+                item['o_seattype_name'] = '软卧(下)'
+            else:
+                item['o_seattype_name'] = '-'
+
+    return orderList
+
+
 def CancelMyOrders(request):
     user_name = request.session.get('user_name', default='')
     user_id = request.session.get('user_id', default='')
@@ -233,43 +303,29 @@ def CancelMyOrders(request):
     if request.method == 'POST':
         date = request.POST.get('date', '')
         if not date:
-            date = request.session.get('date')
-        else:
-            request.session['date'] = date
+            try:
+                date = request.session.get('date')
+            except:
+                date = datetime.date.today()
+        request.session['date'] = date
+
         cancel_oid = request.POST.get('cancel', default='')
-        # print(cancel_oid)
+        print(cancel_oid)
         try:
             order_cc = rail.models.Orders.objects.get(
                 o_oid=cancel_oid)
             if order_cc:
-                # print(order_cc)
                 order_cc.o_orderstatus = 'cancelled'
                 order_cc.save()
                 msg = '取消成功!'
-                if date:
-                    orderList = list(rail.models.Orders.objects.filter(
-                        o_idnumber=user_id, o_departuredate__gte=date
-                    ).values('o_oid', 'o_tid',
-                             'o_departuredate',
-                             'o_departuretime',
-                             'o_departurestation', 'o_seattype',
-                             'o_arrivalstation', 'o_orderstatus',
-                             ))
-                return render(request,
-                              'rail/ShowMyOrders.html',
-                              locals())
         except:
-            pass
-        if date:
-            orderList = list(rail.models.Orders.objects.filter(
-                o_idnumber=user_id, o_departuredate__gte=date
-            ).values('o_oid', 'o_tid',
-                     'o_departuredate',
-                     'o_departuretime',
-                     'o_departurestation', 'o_seattype',
-                     'o_arrivalstation', 'o_orderstatus',
-                     ))
-    msg = 'Maybe flaw here...'
+            msg = '抱歉, 订单取消失败, 请联系管理员'
+
+        if not date:
+            date = datetime.date.today()
+
+        orderList = calcMyOrdersSingle(request, user_id, date)
+
     return render(request,
                   'rail/ShowMyOrders.html',
                   locals())
@@ -280,57 +336,14 @@ def ShowMyOrders(request):
     user_id = request.session.get('user_id', default='')
     user_stat = request.session.get('user_stat', default=False)
 
-    date = request.POST.get('date', '')
-    if not date:
+    try:
+        date = request.POST.get('date', '')
+        orderList = calcMyOrdersSingle(request, user_id, date)
+    except:
         date = request.session.get('date')
-    else:
-        request.session['date'] = date
+        orderList = []
 
-    if not date:
-        return render(request,
-                      'rail/ShowMyOrders.html',
-                      locals())
-
-    # order_list: 订单号，日期、出发到达站、订单状态（是否已经取消）
-    orderList = list(rail.models.Orders.objects.filter(
-        o_idnumber=user_id, o_departuredate__gte=date
-    ).values('o_oid', 'o_tid',
-             'o_departuredate',
-             'o_departuretime',
-             'o_departurestation', 'o_seattype',
-             'o_arrivalstation', 'o_orderstatus',
-             ))
-
-    if not orderList:
-        return render(request,
-                      'rail/ShowMyOrders.html',
-                      locals())
-    else:
-        for item in orderList:
-            o_tid = item['o_tid']
-            o_oid = item['o_oid']
-            o_departurestation = item['o_departurestation']
-            o_arrivalstation = item['o_arrivalstation']
-            o_seattype = str(item['o_seattype'])
-            o_orderstatus = item['o_orderstatus']
-            cost = 0
-
-            try:
-                with connection.cursor() as c:
-                    c.execute(
-                        '''
-                        select check_seat_price(%s,%s,%s);
-                        ''',
-                        [o_tid,
-                         o_departurestation,
-                         o_arrivalstation]
-                    )
-                    f = list(c.fetchall())
-                    cost = SeeOrderCosts(f, o_seattype)
-            except:
-                pass
-
-            item['o_cost'] = cost + 5 if cost else cost
+    request.session['date'] = date
 
     return render(request,
                   'rail/ShowMyOrders.html',
@@ -348,7 +361,7 @@ def BookingTicket(request):
     user_stat = request.session.get('user_stat', default=False)
     pop_msg = ''
 
-    new_question = request.session.get('new_question', default='False')
+    new_order = request.session.get('new_order', default=False)
 
     if request.method == 'POST':
         tid = request.POST.get('tid')
@@ -376,11 +389,7 @@ def BookingTicket(request):
             request.session['arrival'] = arrival
 
         seattype = request.POST.get('seattype', '')
-        if not seattype:
-            seattype = request.session.get('seattype')
-        else:
-            request.session['seattype'] = seattype
-
+        request.session['seattype'] = seattype
         if (
                 not tid
                 or not departure
@@ -388,23 +397,36 @@ def BookingTicket(request):
                 or not date
                 or not seattype
         ):
-            if not new_question:
+            if not new_order:
                 pop_msg = '抱歉, 该座无票或缺少信息, 请您检查后重新提交'
+            else:
+                new_order = False
             return render(request,
                           'rail/BookingTicket.html',
                           locals())
 
-        new_ti_start = rail.models.Trainitems.objects.filter(
-            ti_tid=tid, ti_arrivalstation=departure)[0]
+        if not rail.models.Trainitems.objects.filter(ti_tid=tid):
+            pop_msg = '不存在符合要求的车票, 请尝试再次订票'
+            return render(request,
+                          'rail/BookingTicket.html',
+                          locals())
 
-        new_ti_arrive = rail.models.Trainitems.objects.filter(
-            ti_tid=tid, ti_arrivalstation=arrival)[0]
-
-        departuretime = new_ti_start.ti_departuretime
-
-        oid = str(int(
-            rail.models.Orders.objects.all().order_by(
-                '-o_oid')[0].o_oid) + 1).zfill(15)
+        try:
+            new_ti_start = rail.models.Trainitems.objects.filter(
+                ti_tid=tid, ti_arrivalstation=departure)[0]
+        except:
+            pop_msg = '不存在符合要求的车票, 请检查您的输入'
+            return render(request,
+                          'rail/BookingTicket.html',
+                          locals())
+        try:
+            new_ti_arrive = rail.models.Trainitems.objects.filter(
+                ti_tid=tid, ti_arrivalstation=arrival)[0]
+        except:
+            pop_msg = '不存在符合要求的车票, 请检查您的输入'
+            return render(request,
+                          'rail/BookingTicket.html',
+                          locals())
 
         flag_order = 0
         try:
@@ -421,18 +443,18 @@ def BookingTicket(request):
                      date,
                      seattype]
                 )
-                remRaw = c.fetchall()
-            q = []
-            for r in remRaw:
-                q.append(r[0].lstrip('(').rstrip(')'))
-            q1 = q[0].split(',')
-            if int(q1[1]) > 0:
+                remRawRes = dictfetchall(c)
+            remRes = remRawRes[0]['ctc_remaining_tickets'].lstrip('(').rstrip(')').split(',')
+            if int(remRes[1]) > 0:
                 flag_order = 1
 
         except:
             pass
 
-        if flag_order:
+        oid = str(
+            int(rail.models.Orders.objects.all().order_by('-o_oid')[0].o_oid) + 1).zfill(15)
+        departuretime = new_ti_start.ti_departuretime
+        if flag_order == 1:
             try:
                 with connection.cursor() as c:
                     c.execute(
@@ -462,11 +484,15 @@ def BookingTicket(request):
                               'rail/BookingTicket.html',
                               locals())
         else:
-            pop_msg = '订票失败! 似乎没有票了!'
+            pop_msg = '该票种已售完, 请重新填写订单'
             return render(request,
                           'rail/BookingTicket.html',
                           locals())
-    pop_msg = '订票失败! 请尝试再次订票'
+
+    if not new_order:
+        pop_msg = '订票失败! 请尝试再次订票'
+    else:
+        new_order = False
     return render(request,
                   'rail/BookingTicket.html',
                   locals())
@@ -517,15 +543,19 @@ def AskTidSeeRemain(rt_list):
 
 
 def AskTid(request):
-    request.session['seattype'] = ''
-
     user_name = request.session.get('user_name', default='')
     user_id = request.session.get('user_id', default='')
     user_stat = request.session.get('user_stat', default=False)
     error_msg = ''
     tid_info, departure, arrival, mids = [], [], [], []
 
+    try:
+        del request.session['seattype']
+    except:
+        pass
+
     new_question = request.session.get('new_question', default=True)
+    request.session['new_order'] = True
 
     try:
         input_tid = request.GET.get('tid')
@@ -542,6 +572,8 @@ def AskTid(request):
     if not input_tid:
         if not new_question:
             error_msg = '抱歉, 查询输入失败, 请重试'
+        else:
+            new_question = False
 
     else:
         # ORM method
@@ -616,6 +648,8 @@ def findStationsInCity(request):
     if not input_city:
         if not new_question:
             error_msg = '抱歉, 查询输入不成功, 请重试'
+        else:
+            new_question = False
     else:
         # using connect method
         with connection.cursor() as cursor:
@@ -629,11 +663,4 @@ def findStationsInCity(request):
         station_list = [s[0] for s in station_list]
     return render(request,
                   'rail/findStationsInCity.html',
-                  {
-                      'error_msg': error_msg,
-                      'ask_city': input_city,
-                      'station_list': station_list,
-                      'user_name': user_name,
-                      'user_id': user_id,
-                      'user_stat': user_stat,
-                  })
+                  locals())

@@ -45,7 +45,7 @@
                name="askCitySeq"
                type="radio"
                value="normal">
-        &nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;
         <label for="reverse">返程</label>
         <input type="radio"
                name="askCitySeq"
@@ -59,10 +59,10 @@
 {% endblock %}
 
 {% block answer %}
-    <h2>直达方案</h2>
-    <table style="border-width: medium; border-style: solid;"
-           border="1">
-        {% if fetch_tmp_0 %}
+    {% if fetch_tmp_0 %}
+        <h2>直达方案</h2>
+        <table style="border-width: medium; border-style: solid;"
+               border="1">
             <tr>
                 <th>车次</th>
                 <th>出发时间</th>
@@ -80,49 +80,49 @@
             </tr>
             {% for f in fetch_tmp_0 %}
                 <tr>
-                    <th>{{ f.tid }}</th>
-                    <th>{{ f.sta_time }}</th>
-                    <th>{{ f.sta_station }}</th>
-                    <th>{{ f.arr_time }}</th>
-                    <th>{{ f.arr_station }}</th>
+                    <td>{{ f.tid }}</td>
+                    <td>{{ f.sta_time }}</td>
+                    <td>{{ f.sta_station }}</td>
+                    <td>{{ f.arr_time }}</td>
+                    <td>{{ f.arr_station }}</td>
 
-                    <th>{% ifnotequal f.ssl_r 0 %}
+                    <td>{% ifnotequal f.ssl_r 0 %}
                         ￥{{ f.pr_ssl }}
                     {% else %}
                         -
-                    {% endifnotequal %}</th>
-                    <th>{% ifnotequal f.ssu_r 0 %}
+                    {% endifnotequal %}</td>
+                    <td>{% ifnotequal f.ssu_r 0 %}
                         ￥{{ f.pr_ssu }}
                     {% else %}
                         -
-                    {% endifnotequal %}</th>
-                    <th>{% ifnotequal f.hsl_r 0 %}
+                    {% endifnotequal %}</td>
+                    <td>{% ifnotequal f.hsl_r 0 %}
                         ￥{{ f.pr_hsl }}
                     {% else %}
                         -
-                    {% endifnotequal %}</th>
-                    <th>{% ifnotequal f.hsm_r 0 %}
+                    {% endifnotequal %}</td>
+                    <td>{% ifnotequal f.hsm_r 0 %}
                         ￥{{ f.pr_hsm }}
                     {% else %}
                         -
-                    {% endifnotequal %}</th>
-                    <th>{% ifnotequal f.hsu_r 0 %}
+                    {% endifnotequal %}</td>
+                    <td>{% ifnotequal f.hsu_r 0 %}
                         ￥{{ f.pr_hsu }}
                     {% else %}
                         -
-                    {% endifnotequal %}</th>
-                    <th>{% ifnotequal f.sse_r 0 %}
+                    {% endifnotequal %}</td>
+                    <td>{% ifnotequal f.sse_r 0 %}
                         ￥{{ f.pr_sse }}
                     {% else %}
                         -
-                    {% endifnotequal %}</th>
-                    <th>{% ifnotequal f.hse_r 0 %}
+                    {% endifnotequal %}</td>
+                    <td>{% ifnotequal f.hse_r 0 %}
                         ￥{{ f.pr_hse }}
                     {% else %}
                         -
-                    {% endifnotequal %}</th>
+                    {% endifnotequal %}</td>
 
-                    <th style="color: mediumblue">
+                    <td style="color: mediumblue">
                         <form method="post" action="/rail/BookingTicket/">
                             {% csrf_token %}
                             <input type="hidden" name="tid" value={{ f.tid }}>
@@ -135,17 +135,128 @@
                             <label for={{ f.tid }}></label>
                             <button type="submit" name="submit" id={{ f.tid }}>生成订单</button>
                         </form>
-                    </th>
+                    </td>
                 </tr>
             {% endfor %}
-        {% endif %}
-    </table>
-    <br><br><br>
-    <h2>中转方案</h2>
-    {# TODO #}
+        </table>
+    {% endif %}
+    <br><br>
+    {% if fetch_tmp_1 %}
+        <h2>中转方案</h2>
+        {% for f in fetch_tmp_1 %}
+            <table style="border-width: medium; border-style: solid;" border="1">
+                <tr>
+                    <th>范围</th>
+                    <th>车次</th>
+                    <th>出发时间</th>
+                    <th>出发车站</th>
+                    <th>到达时间</th>
+                    <th>到达车站</th>
+                    <th>软卧(上)</th>
+                    <th>软卧(下)</th>
+                    <th>硬卧(下)</th>
+                    <th>硬卧(中)</th>
+                    <th>硬卧(上)</th>
+                    <th>软座</th>
+                    <th>硬座</th>
+                    <th style="color: mediumblue; font-weight: bold">订票链接</th>
+                </tr>
+                <tr>
+                    <td>前半程</td>
+                    <td>{{ f.ctc_t1_tid }}</td>
+                    <td>{{ f.ctc_t1_starttime }}</td>
+                    <td>{{ f.ctc_t1_startstation }}</td>
+                    <td>{{ f.ctc_t1_arrivetime }}</td>
+                    <td>{{ f.ctc_t1_arrivestation }}</td>
 
+                    <td>{% ifnotequal f.ctc_ssl_remain1 0 %}
+                        ￥{{ f.ctc_ssl_1 }}
+                    {% else %} - {% endifnotequal %}</td>
+                    <td>{% ifnotequal f.ctc_ssu_remain1 0 %}
+                        ￥{{ f.ctc_ssu_1 }}
+                    {% else %} -{% endifnotequal %}</td>
+                    <td>{% ifnotequal f.ctc_hsl_remain1 0 %}
+                        ￥{{ f.ctc_hsl_1 }}
+                    {% else %} - {% endifnotequal %}</td>
+                    <td>{% ifnotequal f.ctc_hsm_remain1 0 %}
+                        ￥{{ f.ctc_hsm_1 }}
+                    {% else %} -{% endifnotequal %}</td>
+                    <td>{% ifnotequal f.ctc_hsu_remain1 0 %}
+                        ￥{{ f.ctc_hsu_1 }}
+                    {% else %} -{% endifnotequal %}</td>
+                    <td>{% ifnotequal f.ctc_sse_remain1 0 %}
+                        ￥{{ f.ctc_sse_1 }}
+                    {% else %} -{% endifnotequal %}</td>
+                    <td>{% ifnotequal f.ctc_hse_remain1 0 %}
+                        ￥{{ f.ctc_hse_1 }}
+                    {% else %} - {% endifnotequal %}</td>
 
+                    <td style="color: mediumblue">
+                        <form method="post" action="/rail/BookingTicket/">
+                            {% csrf_token %}
+                            <input type="hidden" name="tid" value={{ f.ctc_t1_tid }}>
+                            <input type="hidden" name="departure" value={{ f.ctc_t1_startstation }}>
+                            <input type="hidden" name="arrival" value={{ f.ctc_t1_arrivestation }}>
+                            <input type="hidden" name="date"
+                                   value={% if date %}{{ date }}
+                                       {% else %}{% tomorrow "%Y-%m-%d" %}
+                                   {% endif %}>
+                            <label for={{ f.ctc_t1_tid }}></label>
+                            <button type="submit" name="submit" id={{ f.ctc_t1_tid }}>生成订单</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr>
+                    <td>后半程</td>
+                    <td>{{ f.ctc_t2_tid }}</td>
+                    <td>{{ f.ctc_t2_starttime }}</td>
+                    <td>{{ f.ctc_t2_startstation }}</td>
+                    <td>{{ f.ctc_t2_arrivetime }}</td>
+                    <td>{{ f.ctc_t2_arrivestation }}</td>
 
+                    <td>{% ifnotequal f.ctc_ssl_remain2 0 %}
+                        ￥{{ f.ctc_ssl_2 }}
+                    {% else %} - {% endifnotequal %}</td>
+                    <td>{% ifnotequal f.ctc_ssu_remain2 0 %}
+                        ￥{{ f.ctc_ssu_2 }}
+                    {% else %} -{% endifnotequal %}</td>
+                    <td>{% ifnotequal f.ctc_hsl_remain2 0 %}
+                        ￥{{ f.ctc_hsl_2 }}
+                    {% else %} - {% endifnotequal %}</td>
+                    <td>{% ifnotequal f.ctc_hsm_remain2 0 %}
+                        ￥{{ f.ctc_hsm_2 }}
+                    {% else %} -{% endifnotequal %}</td>
+                    <td>{% ifnotequal f.ctc_hsu_remain2 0 %}
+                        ￥{{ f.ctc_hsu_2 }}
+                    {% else %} -{% endifnotequal %}</td>
+                    <td>{% ifnotequal f.ctc_sse_remain2 0 %}
+                        ￥{{ f.ctc_sse_2 }}
+                    {% else %} -{% endifnotequal %}</td>
+                    <td>{% ifnotequal f.ctc_hse_remain2 0 %}
+                        ￥{{ f.ctc_hse_2 }}
+                    {% else %} - {% endifnotequal %}</td>
+
+                    <td style="color: mediumblue">
+                        <form method="post" action="/rail/BookingTicket/">
+                            {% csrf_token %}
+                            <input type="hidden" name="tid" value={{ f.ctc_t2_tid }}>
+                            <input type="hidden" name="departure" value={{ f.ctc_t2_startstation }}>
+                            <input type="hidden" name="arrival" value={{ f.ctc_t2_arrivestation }}>
+                            <input type="hidden" name="date"
+                                   value={% if date %}{{ date }}
+                                       {% else %}{% tomorrow "%Y-%m-%d" %}
+                                   {% endif %}>
+                            <label for={{ f.ctc_t2_tid }}></label>
+                            <button type="submit" name="submit" id={{ f.ctc_t2_tid }}>生成订单</button>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+            <br>
+        {% endfor %}
+        <br>
+    {% endif %}
+    <br>
 {% endblock %}
 
 
