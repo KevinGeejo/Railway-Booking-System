@@ -59,7 +59,7 @@
 {% endblock %}
 
 {% block answer %}
-    {% if fetch_tmp_0 %}
+    {% if fetch_tmp_a %}
         <h2>直达方案</h2>
         <table style="border-width: medium; border-style: solid;"
                border="1">
@@ -78,14 +78,14 @@
                 <th>硬座</th>
                 <th style="color: mediumblue; font-weight: bold">订票链接</th>
             </tr>
-            {% for f in fetch_tmp_0 %}
+            {% for f in fetch_tmp_a %}
                 <tr>
                     <td>{{ f.tid }}</td>
                     <td>{{ f.sta_time }}</td>
                     <td>{{ f.sta_station }}</td>
                     <td>
                         {{ f.arr_time }}
-                        {% if f.offset_day  %}
+                        {% if f.offset_day %}
                             (+{{ f.offset_day }})
                         {% endif %}
                     </td>
@@ -146,9 +146,9 @@
         </table>
     {% endif %}
     <br><br>
-    {% if fetch_tmp_1 %}
+    {% if fetch_tmp_b %}
         <h2>中转方案</h2>
-        {% for f in fetch_tmp_1 %}
+        {% for f in fetch_tmp_b %}
             <table style="border-width: medium; border-style: solid;" border="1">
                 <tr>
                     <th>范围</th>
@@ -171,7 +171,12 @@
                     <td>{{ f.ctc_t1_tid }}</td>
                     <td>{{ f.ctc_t1_starttime }}</td>
                     <td>{{ f.ctc_t1_startstation }}</td>
-                    <td>{{ f.ctc_t1_arrivetime }}</td>
+                    <td>
+                        {{ f.ctc_t1_arrivetime }}
+                        {% if f.ctc_t1_arrive_offsetday %}
+                            (+{{ f.ctc_t1_arrive_offsetday }})
+                        {% endif %}
+                    </td>
                     <td>{{ f.ctc_t1_arrivestation }}</td>
 
                     <td>{% ifnotequal f.ctc_ssl_remain1 0 %}
@@ -214,12 +219,17 @@
                 <tr>
                     <td>后半程</td>
                     <td>{{ f.ctc_t2_tid }}</td>
-                    <td>{{ f.ctc_t2_starttime }}</td>
+                    <td>
+                        {{ f.ctc_t2_starttime }}
+                        {% if f.offset_day_start_2 %}
+                            (+{{ f.offset_day_start_2 }})
+                        {% endif %}
+                    </td>
                     <td>{{ f.ctc_t2_startstation }}</td>
                     <td>
                         {{ f.ctc_t2_arrivetime }}
-                        {% if f.offset_day_2  %}
-                            (+{{ f.offset_day_2 }})
+                        {% if f.offset_day_fi_2 %}
+                            (+{{ f.offset_day_fi_2 }})
                         {% endif %}
                     </td>
                     <td>{{ f.ctc_t2_arrivestation }}</td>
@@ -253,7 +263,7 @@
                             <input type="hidden" name="departure" value={{ f.ctc_t2_startstation }}>
                             <input type="hidden" name="arrival" value={{ f.ctc_t2_arrivestation }}>
                             <input type="hidden" name="date"
-                                   value={% if date %}{{ date }}
+                                   value={% if f.start_date_2 %}{{ f.start_date_2 }}
                                        {% else %}{% tomorrow "%Y-%m-%d" %}
                                    {% endif %}>
                             <label for={{ f.ctc_t2_tid }}></label>

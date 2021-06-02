@@ -107,8 +107,8 @@ def AskCities(request):
             tmp = departureCity
             departureCity = arrivalCity
             arrivalCity = tmp
-            current_date = datetime.datetime.strptime(date, '%Y-%m-%d')
-            next_date = current_date + datetime.timedelta(days=1)
+            start_datetime_1 = datetime.datetime.strptime(date, '%Y-%m-%d')
+            next_date = start_datetime_1 + datetime.timedelta(days=1)
             date = next_date.strftime('%Y-%m-%d')
         # 查找直达方案
         try:
@@ -124,11 +124,11 @@ def AskCities(request):
                     """
                     , [departureCity, arrivalCity, time, date]
                 )
-                fetch_tmp_0 = dictfetchall(c0)
-                for f in fetch_tmp_0:
+                fetch_tmp_a = dictfetchall(c0)
+                for f in fetch_tmp_a:
                     f['offset_day'] = f['gap_time'].days
         except:
-            fetch_tmp_0 = {}
+            fetch_tmp_a = {}
 
         # 查找中转方案
         try:
@@ -144,11 +144,30 @@ def AskCities(request):
                     """,
                     [departureCity, arrivalCity, time, date]
                 )
-                fetch_tmp_1 = dictfetchall(c1)
-                for f in fetch_tmp_1:
-                    f['offset_day_2'] = f['ctc_time_gap'].days
+                fetch_tmp_b = dictfetchall(c1)
+                for f in fetch_tmp_b:
+                    start_datetime_1 = datetime.datetime.strptime(date, '%Y-%m-%d')
+                    start_time_1 = f['ctc_t1_starttime']
+                    ctc_t1_arrive_offsetday = f['ctc_t1_arrive_offsetday']
+                    ctc_t2_start_offsetday = f['ctc_t2_start_offsetday']
+                    start_datetime_1 = start_datetime_1 + datetime.timedelta(
+                        hours=start_time_1.hour,
+                        minutes=start_time_1.minute)
+                    arrive_datetime_2 = start_datetime_1 + f['ctc_time_gap']
+
+                    start_date_1 = start_datetime_1.date()
+                    arrive_date_2 = arrive_datetime_2.date()
+
+                    f['offset_day_fi_1'] = ctc_t1_arrive_offsetday
+                    f['offset_day_start_2'] = ctc_t2_start_offsetday
+                    f['offset_day_fi_2'] = (arrive_date_2 - start_date_1).days
+
+                    start_date_2 = start_datetime_1 + datetime.timedelta(
+                        days=ctc_t2_start_offsetday)
+                    f['start_date_2'] = start_date_2.strftime('%Y-%m-%d')
+
         except:
-            fetch_tmp_1 = {}
+            fetch_tmp_b = {}
 
     return render(request,
                   'rail/AskCities.html',
