@@ -65,7 +65,7 @@
                     <td>{{ order.o_orderstatus }}</td>
                     <td>
                         {% ifequal order.o_orderstatus 'valid' %}
-                            <form metdod="post" action="/rail/CancelMyOrders/">
+                            <form method="post" action="/rail/CancelMyOrders/">
                                 {% csrf_token %}
                                 <input type="hidden" name="cancel" value={{ order.o_oid }}>
                                 <label for={{ order.o_oid }}></label>

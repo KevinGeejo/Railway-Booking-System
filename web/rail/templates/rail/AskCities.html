@@ -54,7 +54,7 @@
         <br><br>
         <button type="submit">查询行程</button>
     </form>
-    <br><br>
+    <br>
 
 {% endblock %}
 
@@ -69,8 +69,8 @@
                 <th>出发车站</th>
                 <th>到达时间</th>
                 <th>到达车站</th>
-                <th>软卧(上)</th>
                 <th>软卧(下)</th>
+                <th>软卧(上)</th>
                 <th>硬卧(下)</th>
                 <th>硬卧(中)</th>
                 <th>硬卧(上)</th>
@@ -83,7 +83,12 @@
                     <td>{{ f.tid }}</td>
                     <td>{{ f.sta_time }}</td>
                     <td>{{ f.sta_station }}</td>
-                    <td>{{ f.arr_time }}</td>
+                    <td>
+                        {{ f.arr_time }}
+                        {% if f.offset_day  %}
+                            (+{{ f.offset_day }})
+                        {% endif %}
+                    </td>
                     <td>{{ f.arr_station }}</td>
 
                     <td>{% ifnotequal f.ssl_r 0 %}
@@ -152,8 +157,8 @@
                     <th>出发车站</th>
                     <th>到达时间</th>
                     <th>到达车站</th>
-                    <th>软卧(上)</th>
                     <th>软卧(下)</th>
+                    <th>软卧(上)</th>
                     <th>硬卧(下)</th>
                     <th>硬卧(中)</th>
                     <th>硬卧(上)</th>
@@ -211,7 +216,12 @@
                     <td>{{ f.ctc_t2_tid }}</td>
                     <td>{{ f.ctc_t2_starttime }}</td>
                     <td>{{ f.ctc_t2_startstation }}</td>
-                    <td>{{ f.ctc_t2_arrivetime }}</td>
+                    <td>
+                        {{ f.ctc_t2_arrivetime }}
+                        {% if f.offset_day_2  %}
+                            (+{{ f.offset_day_2 }})
+                        {% endif %}
+                    </td>
                     <td>{{ f.ctc_t2_arrivestation }}</td>
 
                     <td>{% ifnotequal f.ctc_ssl_remain2 0 %}

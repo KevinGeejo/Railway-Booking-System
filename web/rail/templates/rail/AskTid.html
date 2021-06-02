@@ -143,18 +143,25 @@
                         {% endifequal %}
                     </td>
                     <td style="color: mediumblue">
-                        <form method="post" action="/rail/BookingTicket/">
-                            {% csrf_token %}
-                            <input type="hidden" name="tid" value={{ input_tid }}>
-                            <input type="hidden" name="departure" value={{ departure.ti_arrivalstation }}>
-                            <input type="hidden" name="arrival" value={{ item.ti_arrivalstation }}>
-                            <input type="hidden" name="date"
-                                   value={% if date %}{{ date }}
-                                       {% else %}{% tomorrow "%Y-%m-%d" %}
-                                   {% endif %}>
-                            <label for={{ f.tid }}></label>
-                            <button type="submit" name="submit" id={{ f.tid }}>生成订单</button>
-                        </form>
+                        {% for rem in remList %}
+                            {% ifequal rem.0 item.ti_seq %}
+                                {% if rem.1 > 0 %}
+                                    <form method="post" action="/rail/BookingTicket/">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="tid" value={{ input_tid }}>
+                                        <input type="hidden" name="departure" value={{ departure.ti_arrivalstation }}>
+                                        <input type="hidden" name="arrival" value={{ item.ti_arrivalstation }}>
+                                        <input type="hidden" name="date"
+                                               value={% if date %}{{ date }}
+                                                   {% else %}{% tomorrow "%Y-%m-%d" %}
+                                               {% endif %}>
+                                        <label for={{ f.tid }}></label>
+                                        <button type="submit" name="submit" id={{ f.tid }}>生成订单</button>
+                                    </form>
+                                {% else %} -
+                                {% endif %}
+                            {% endifequal %}
+                        {% endfor %}
                     </td>
                 </tr>
             {% empty %}
@@ -223,23 +230,25 @@
                     {% endifequal %}
                 </td>
                 <td style="color: mediumblue">
-                    <form method="post" action="/rail/BookingTicket/">
-                        {% csrf_token %}
-                        <input type="hidden" name="tid" value={{ input_tid }}>
-                        <input type="hidden" name="departure" value={{ departure.ti_arrivalstation }}>
-                        <input type="hidden" name="arrival" value={{ arrival.ti_arrivalstation }}>
-                        <input type="hidden" name="date"
-                               value={% if date %}{{ date }}
-                                   {% else %}{% tomorrow "%Y-%m-%d" %}
-                               {% endif %}>
-                        <label for={{ f.tid }}></label>
-                        <button type="submit" name="submit" id={{ f.tid }}>生成订单</button>
-                    </form>
+                    {% if lastList.1 > 0 %}
+                        <form method="post" action="/rail/BookingTicket/">
+                            {% csrf_token %}
+                            <input type="hidden" name="tid" value={{ input_tid }}>
+                            <input type="hidden" name="departure" value={{ departure.ti_arrivalstation }}>
+                            <input type="hidden" name="arrival" value={{ arrival.ti_arrivalstation }}>
+                            <input type="hidden" name="date"
+                                   value={% if date %}{{ date }}
+                                       {% else %}{% tomorrow "%Y-%m-%d" %}
+                                   {% endif %}>
+                            <label for={{ f.tid }}></label>
+                            <button type="submit" name="submit" id={{ f.tid }}>生成订单</button>
+                        </form>
+                    {% else %} -
+                    {% endif %}
                 </td>
             </tr>
         </table>
         <br>
-        <input type="submit" value="前往生成订单">
     {% endif %}
 {% endblock %}
 

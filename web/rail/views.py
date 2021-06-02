@@ -125,8 +125,10 @@ def AskCities(request):
                     , [departureCity, arrivalCity, time, date]
                 )
                 fetch_tmp_0 = dictfetchall(c0)
+                for f in fetch_tmp_0:
+                    f['offset_day'] = f['gap_time'].days
         except:
-            pass
+            fetch_tmp_0 = {}
 
         # 查找中转方案
         try:
@@ -143,8 +145,10 @@ def AskCities(request):
                     [departureCity, arrivalCity, time, date]
                 )
                 fetch_tmp_1 = dictfetchall(c1)
+                for f in fetch_tmp_1:
+                    f['offset_day_2'] = f['ctc_time_gap'].days
         except:
-            pass
+            fetch_tmp_1 = {}
 
     return render(request,
                   'rail/AskCities.html',
@@ -299,14 +303,15 @@ def CancelMyOrders(request):
     user_name = request.session.get('user_name', default='')
     user_id = request.session.get('user_id', default='')
     user_stat = request.session.get('user_stat', default=False)
-
+    print(request.POST)
     if request.method == 'POST':
+        print("check 01")
         date = request.POST.get('date', '')
         if not date:
             try:
                 date = request.session.get('date')
             except:
-                date = datetime.date.today()
+                date = datetime.date.today().strftime('%Y-%m-%d')
         request.session['date'] = date
 
         cancel_oid = request.POST.get('cancel', default='')
@@ -322,7 +327,7 @@ def CancelMyOrders(request):
             msg = '抱歉, 订单取消失败, 请联系管理员'
 
         if not date:
-            date = datetime.date.today()
+            date = datetime.date.today().strftime('%Y-%m-%d')
 
         orderList = calcMyOrdersSingle(request, user_id, date)
 
@@ -593,7 +598,7 @@ def AskTid(request):
 
         arrival = tid_info[-1]
         request.session['arrival'] = str(arrival.ti_arrivalstation)
-        mids = tid_info[1:-2]
+        mids = tid_info[1:-1]
 
         try:
             tmp_fetch = []
