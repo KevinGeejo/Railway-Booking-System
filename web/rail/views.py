@@ -303,9 +303,7 @@ def CancelMyOrders(request):
     user_name = request.session.get('user_name', default='')
     user_id = request.session.get('user_id', default='')
     user_stat = request.session.get('user_stat', default=False)
-    print(request.POST)
     if request.method == 'POST':
-        print("check 01")
         date = request.POST.get('date', '')
         if not date:
             try:
