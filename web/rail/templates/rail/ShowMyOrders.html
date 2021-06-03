@@ -29,13 +29,10 @@
 {% endblock %}
 
 {% block answer %}
-    {% if msg %}
-        {{ msg }}
+    {% if msg %}{{ msg }} <br><br>
+    {% else %}<br><br><br>
     {% endif %}
-
-    {% if not orderList %}
-        {#  抱歉, 找不到符合要求的订单.#}
-    {% else %}
+    {% if orderList %}
         按状态/发车日期/订单号排序:
         <table style="border-width: medium;
                        border-style: solid;"

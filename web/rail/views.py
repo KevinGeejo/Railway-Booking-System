@@ -197,7 +197,7 @@ def AdminPage(request):
 
     # 3. 热点车次 Top 10
     hot_list = list(
-        rail.models.Orders.objects.all().values('o_tid'))
+        rail.models.Orders.objects.filter(o_orderstatus='valid').values('o_tid'))
     tidList = []
     for hot in hot_list:
         tidList.append(hot['o_tid'])
